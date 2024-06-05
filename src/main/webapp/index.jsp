@@ -6,37 +6,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CyberTech Emporium</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         <%@include file="style.css"%> <!-- Includiamo il file CSS -->
+
+        /* Carosello */
+        .carousel {
+            width: 80%;
+            margin: auto;
+            max-height: 400px; /* Limitiamo l'altezza del carosello */
+        }
         .carousel img {
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: cover; /* Assicuriamo che le immagini si adattino correttamente */
         }
-
         .carousel-inner {
             position: relative;
             width: 100%;
             overflow: hidden;
         }
-
         .carousel-item {
             display: none;
             position: absolute;
             width: 100%;
+            height: 400px; /* Impostiamo l'altezza del carosello */
             transition: opacity 0.5s ease-in-out;
         }
-
         .carousel-item.active {
             display: block;
             position: relative;
             opacity: 1;
         }
-
-        .carousel-item img {
-            display: block;
+        .carousel img {
             width: 100%;
+            height: 100%;
+            object-fit: contain; /* Impostiamo object-fit a 'contain' */
         }
+
 
         .carousel-control-prev, .carousel-control-next {
             position: absolute;
@@ -48,28 +55,59 @@
             border-radius: 50%;
             cursor: pointer;
         }
-
         .carousel-control-prev {
             left: 10px;
         }
-
         .carousel-control-next {
             right: 10px;
         }
-
         .carousel-control-prev:hover, .carousel-control-next:hover {
             background-color: #0073e6;
         }
 
-        .brands img {
-            max-width: 200px;
-            margin: 10px;
-            filter: grayscale(100%);
-            transition: filter 0.3s ease;
+        /* Prodotti e offerte */
+        .products .product img {
+            width: 100%;
+            height: auto;
         }
 
-        .brands img:hover {
-            filter: grayscale(0%);
+        /* Brand logos */
+        .brands {
+            display: flex;
+            align-items: center;
+            justify-content: space-around; /* Distribuiamo equamente le icone */
+            padding: 20px;
+            white-space: nowrap;
+            flex-wrap: wrap;
+        }
+        .brands h2 {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .brands .brand-icon {
+            font-size: 60px;
+            margin: 20px;
+            color: #333;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .brands .brand-icon:hover {
+            color: #0073e6;
+            transform: scale(1.2);
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+        .brands .brand-icon {
+            animation: bounce 2s infinite;
         }
     </style>
 </head>
@@ -81,15 +119,28 @@
 
 <div class="carousel">
     <div class="carousel-inner">
-        <div class="carousel-item active">
-            <img src="https://via.placeholder.com/1200x400?text=Tech+Product+1" alt="Tech Product 1">
+        <%@ page import="java.sql.*" %>
+        <%
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/ecommerce","root","root");
+                Statement stmt=con.createStatement();
+                ResultSet rs=stmt.executeQuery("SELECT id, nome FROM Prodotti LIMIT 3");
+                boolean first = true;
+                while(rs.next()) {
+                    String activeClass = first ? "active" : "";
+                    first = false;
+        %>
+        <div class="carousel-item <%= activeClass %>">
+            <img src="getImage?id=<%= rs.getInt("id") %>" alt="<%= rs.getString("nome") %>">
         </div>
-        <div class="carousel-item">
-            <img src="https://via.placeholder.com/1200x400?text=Tech+Product+2" alt="Tech Product 2">
-        </div>
-        <div class="carousel-item">
-            <img src="https://via.placeholder.com/1200x400?text=Tech+Product+3" alt="Tech Product 3">
-        </div>
+        <%
+                }
+                con.close();
+            } catch(Exception e) {
+                out.println(e);
+            }
+        %>
     </div>
     <a class="carousel-control-prev" onclick="prevSlide()">&#10094;</a>
     <a class="carousel-control-next" onclick="nextSlide()">&#10095;</a>
@@ -104,11 +155,11 @@
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/ecommerce","root","root");
                 Statement stmt=con.createStatement();
-                ResultSet rs=stmt.executeQuery("SELECT * FROM Prodotti");
+                ResultSet rs=stmt.executeQuery("SELECT id, nome, prezzo FROM Prodotti");
                 while(rs.next()) {
         %>
         <div class="product">
-            <img src="<%= rs.getString("immagine") %>" alt="<%= rs.getString("nome") %>">
+            <img src="getImage?id=<%= rs.getInt("id") %>" alt="<%= rs.getString("nome") %>">
             <h3><%= rs.getString("nome") %></h3>
             <p>$<%= rs.getString("prezzo") %></p>
         </div>
@@ -132,11 +183,11 @@
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/ecommerce","root","root");
                 Statement stmt=con.createStatement();
-                ResultSet rs=stmt.executeQuery("SELECT * FROM OfferteSpeciali");
+                ResultSet rs=stmt.executeQuery("SELECT id, nome, prezzo FROM OfferteSpeciali");
                 while(rs.next()) {
         %>
         <div class="product">
-            <img src="<%= rs.getString("immagine") %>" alt="<%= rs.getString("nome") %>">
+            <img src="getImage?id=<%= rs.getInt("id") %>" alt="<%= rs.getString("nome") %>">
             <h3><%= rs.getString("nome") %></h3>
             <p>$<%= rs.getString("prezzo") %></p>
         </div>
@@ -152,12 +203,10 @@
 
 <div class="brands">
     <h2>Our Brands</h2>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/1200px-Microsoft_logo.svg.png" alt="Microsoft">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Apple-logo.png/640px-Apple-logo.png" alt="Apple">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Intel-logo.svg/1024px-Intel-logo.svg.png" alt="Intel">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/AMD_Logo.svg/1280px-AMD_Logo.svg.png" alt="AMD">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Google_Logo.svg/512px-Google_Logo.svg.png" alt="Google">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Logo-HP-2022.svg/1280px-Logo-HP-2022.svg.png" alt="HP">
+    <i class="fab fa-microsoft brand-icon"></i>
+    <i class="fab fa-apple brand-icon"></i>
+    <i class="fab fa-amazon brand-icon"></i>
+    <i class="fab fa-google brand-icon"></i>
 </div>
 
 <div class="footer">
@@ -178,7 +227,7 @@
     }
 
     function nextSlide() {
-        slideIndex = (slideIndex +         1) % slides.length;
+        slideIndex = (slideIndex + 1) % slides.length;
         showSlide(slideIndex);
     }
 
