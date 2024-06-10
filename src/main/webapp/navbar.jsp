@@ -71,19 +71,32 @@
     </style>
 </head>
 <body>
-<div class="navbar">
-    <a href="home.jsp"><i class="fa fa-home"></i> Home</a>
+<div class="navbar" id="navbar">
+    <a href="index.jsp"><i class="fa fa-home"></i> Home</a>
     <a href="products.jsp"><i class="fa fa-box-open"></i> Products</a>
+    <a href="preventivo.jsp"><i class="fa fa-file-invoice-dollar"></i> Preventivo</a>
     <a href="about.jsp"><i class="fa fa-info-circle"></i> About Us</a>
     <a href="contact.jsp"><i class="fa fa-envelope"></i> Contact</a>
-    <div class="navbar-right">
-        <!-- Link per il login/registrazione o l'accesso all'account -->
-        <a href="login.jsp"><i class="fa fa-user"></i> Login</a>
-        <a href="register.jsp"><i class="fa fa-user-plus"></i> Register</a>
-        <!-- Oppure, se l'utente è già loggato, mostra l'accesso all'account -->
-        <!-- <a href="#"><i class="fa fa-user-circle"></i> Account</a> -->
-        <a href="cart.jsp"><i class="fa fa-shopping-cart"></i> Cart</a>
+    <div class="navbar-right" id="navbarRight">
+        <!-- JavaScript sostituirà dinamicamente questo div con i link appropriati -->
     </div>
+    <a href="cart.jsp"><i class="fa fa-shopping-cart"></i> Cart</a>
 </div>
+
+<!-- JavaScript per aggiornare dinamicamente la navbar -->
+<script>
+    // Controlla lo stato di autenticazione dell'utente
+    var userLoggedIn = <%= session.getAttribute("user") != null %>;
+
+    // Se l'utente è autenticato, mostra il link di logout e l'account
+    if (userLoggedIn) {
+        document.getElementById("navbarRight").innerHTML = '<a href="logout.jsp"><i class="fa fa-sign-out-alt"></i> Logout</a>' +
+            '<a href="user.jsp"><i class="fa fa-user"></i> Account</a>';
+    } else {
+        // Altrimenti, mostra il link di login e il link di registrazione
+        document.getElementById("navbarRight").innerHTML = '<a href="login.jsp"><i class="fa fa-user"></i> Login</a>' +
+            '<a href="register.jsp"><i class="fa fa-user-plus"></i> Register</a>';
+    }
+</script>
 </body>
 </html>

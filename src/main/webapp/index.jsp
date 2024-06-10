@@ -1,4 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +10,14 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-        <%@include file="style.css"%> <!-- Includiamo il file CSS -->
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Includiamo il file CSS */
+        <%@ include file="style.css" %>
 
         /* Carosello */
         .carousel {
@@ -17,10 +26,12 @@
             max-height: 400px; /* Limitiamo l'altezza del carosello */
         }
         .carousel img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* Assicuriamo che le immagini si adattino correttamente */
+            width: auto;
+            height: 400px;
+            object-fit: contain; /* Manteniamo le proporzioni delle immagini */
+            margin: 0 auto; /* Centriamo le immagini */
         }
+
         .carousel-inner {
             position: relative;
             width: 100%;
@@ -32,18 +43,15 @@
             width: 100%;
             height: 400px; /* Impostiamo l'altezza del carosello */
             transition: opacity 0.5s ease-in-out;
+            text-align: center; /* Centriamo le immagini */
         }
+
+
         .carousel-item.active {
             display: block;
             position: relative;
             opacity: 1;
         }
-        .carousel img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* Impostiamo object-fit a 'contain' */
-        }
-
 
         .carousel-control-prev, .carousel-control-next {
             position: absolute;
@@ -90,6 +98,8 @@
             margin: 20px;
             color: #333;
             transition: color 0.3s ease, transform 0.3s ease;
+            animation: bounce 2s infinite;
+            flex: 1; /* Le icone occupano tutto lo spazio disponibile */
         }
         .brands .brand-icon:hover {
             color: #0073e6;
@@ -106,13 +116,36 @@
                 transform: translateY(-5px);
             }
         }
-        .brands .brand-icon {
-            animation: bounce 2s infinite;
+
+        /* Modifica della scritta principale */
+        .header h1 {
+            font-size: 48px; /* Aumentiamo la dimensione del testo */
+            text-align: center; /* Centriamo il testo */
+        }
+
+        .header h1 .cyber {
+            color: #0073e6; /* Colore del testo per "CyberTech" */
+            font-weight: bold; /* Rendiamo il testo più evidente */
+            animation: neon-glow 1s infinite alternate; /* Aggiungiamo un'animazione neon */
+        }
+
+        .header h1 .emporium {
+            color: #333; /* Colore del testo per "Emporium" */
+            text-decoration: underline; /* Aggiungiamo una sottolineatura */
+        }
+
+        @keyframes neon-glow {
+            from {
+                text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #0073e6, 0 0 40px #0073e6, 0 0 70px #0073e6, 0 0 80px #0073e6, 0 0 100px #0073e6, 0 0 150px #0073e6;
+            }
+            to {
+                text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0073e6, 0 0 20px #0073e6, 0 0 35px #0073e6, 0 0 40px #0073e6, 0 0 50px #0073e6, 0 0 75px #0073e6;
+            }
         }
     </style>
 </head>
 <body>
-<%@include file="navbar.jsp"%> <!-- Includiamo la barra di navigazione -->
+<%@ include file="navbar.jsp" %> <!-- Includiamo la barra di navigazione -->
 <div class="header">
     <h1>Welcome to CyberTech Emporium</h1>
 </div>
@@ -123,11 +156,11 @@
         <%
             try {
                 Class.forName("com.mysql.cj.jdbc.Driver");
-                Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/ecommerce","root","root");
-                Statement stmt=con.createStatement();
-                ResultSet rs=stmt.executeQuery("SELECT id, nome FROM Prodotti LIMIT 3");
+                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/ecommerce", "root", "root");
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT id, nome FROM Prodotti LIMIT 3");
                 boolean first = true;
-                while(rs.next()) {
+                while (rs.next()) {
                     String activeClass = first ? "active" : "";
                     first = false;
         %>
@@ -137,7 +170,7 @@
         <%
                 }
                 con.close();
-            } catch(Exception e) {
+            } catch (Exception e) {
                 out.println(e);
             }
         %>
@@ -149,14 +182,13 @@
 <div class="section">
     <h2>Featured Products</h2>
     <div class="products">
-        <%@ page import="java.sql.*" %>
         <%
             try {
                 Class.forName("com.mysql.cj.jdbc.Driver");
-                Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/ecommerce","root","root");
-                Statement stmt=con.createStatement();
-                ResultSet rs=stmt.executeQuery("SELECT id, nome, prezzo FROM Prodotti");
-                while(rs.next()) {
+                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/ecommerce", "root", "root");
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT id, nome, prezzo FROM Prodotti");
+                while (rs.next()) {
         %>
         <div class="product">
             <img src="getImage?id=<%= rs.getInt("id") %>" alt="<%= rs.getString("nome") %>">
@@ -166,7 +198,7 @@
         <%
                 }
                 con.close();
-            } catch(Exception e) {
+            } catch (Exception e) {
                 out.println(e);
             }
         %>
@@ -181,10 +213,10 @@
         <%
             try {
                 Class.forName("com.mysql.cj.jdbc.Driver");
-                Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/ecommerce","root","root");
-                Statement stmt=con.createStatement();
-                ResultSet rs=stmt.executeQuery("SELECT id, nome, prezzo FROM OfferteSpeciali");
-                while(rs.next()) {
+                Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/ecommerce", "root", "root");
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT id, nome, prezzo FROM OfferteSpeciali");
+                while (rs.next()) {
         %>
         <div class="product">
             <img src="getImage?id=<%= rs.getInt("id") %>" alt="<%= rs.getString("nome") %>">
@@ -194,8 +226,8 @@
         <%
                 }
                 con.close();
-            } catch(Exception e) {
-                out.println(e);
+            } catch (Exception e) {  // Corrected the typo here
+                out.println(e);       // Use the variable `e`
             }
         %>
     </div>
@@ -203,11 +235,20 @@
 
 <div class="brands">
     <h2>Our Brands</h2>
-    <i class="fab fa-microsoft brand-icon"></i>
-    <i class="fab fa-apple brand-icon"></i>
-    <i class="fab fa-amazon brand-icon"></i>
-    <i class="fab fa-google brand-icon"></i>
+    <div class="brand-icons">
+        <i class="fab fa-microsoft brand-icon"></i>
+        <i class="fab fa-apple brand-icon"></i>
+        <i class="fab fa-amazon brand-icon"></i>
+        <i class="fab fa-google brand-icon"></i>
+    </div>
 </div>
+
+<%-- Codice per mostrare il profilo dell'utente loggato --%>
+<% if (session.getAttribute("user") != null) { %>
+<div class="user-profile">
+    <a href="account.jsp"><i class="fa fa-user-circle"></i> <%= session.getAttribute("user") %></a>
+</div>
+<% } %>
 
 <div class="footer">
     <p>&copy; 2024 CyberTech Emporium. All rights reserved.</p>
