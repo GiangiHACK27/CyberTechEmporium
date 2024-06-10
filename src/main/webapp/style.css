@@ -1,3 +1,4 @@
+/* Stile generale per il corpo della pagina */
 body {
     font-family: 'Roboto', sans-serif;
     margin: 0;
@@ -6,6 +7,7 @@ body {
     color: #fff;
 }
 
+/* Stile per la barra di navigazione */
 .navbar {
     background-color: #1f1f1f;
     overflow: hidden;
@@ -27,6 +29,7 @@ body {
     color: #fff;
 }
 
+/* Stile per l'intestazione */
 .header {
     background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
     color: #fff;
@@ -34,6 +37,7 @@ body {
     text-align: center;
 }
 
+/* Stile per il carosello */
 .carousel {
     width: 100%;
     overflow: hidden;
@@ -54,6 +58,7 @@ body {
     75%, 95% { transform: translateX(-300%); }
 }
 
+/* Stile per le sezioni */
 .section {
     padding: 40px;
     text-align: center;
@@ -67,6 +72,7 @@ body {
     color: #0073e6;
 }
 
+/* Stile per i prodotti */
 .products {
     display: flex;
     justify-content: center;
@@ -105,6 +111,7 @@ body {
     font-size: 18px;
 }
 
+/* Stile per i marchi */
 .brands {
     padding: 40px;
     text-align: center;
@@ -123,6 +130,7 @@ body {
     transform: scale(1.1);
 }
 
+/* Stile per il piè di pagina */
 .footer {
     background-color: #1f1f1f;
     color: #fff;
@@ -130,3 +138,80 @@ body {
     padding: 20px;
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
 }
+
+/* Stile per il form di contatto */
+.contact-form {
+    background-color: #333;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 500px; /* Ridimensiona la larghezza del form */
+    margin: auto;
+}
+
+.contact-form .form-group {
+    margin-bottom: 15px;
+}
+
+.contact-form label {
+    display: block;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.contact-form input[type="text"],
+.contact-form input[type="email"],
+.contact-form textarea {
+    width: calc(100% - 22px); /* Aggiusta la larghezza degli input per il bordo */
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: #444;
+    color: #fff;
+}
+
+.contact-form textarea {
+    resize: none;
+}
+
+.contact-form button[type="submit"] {
+    background-color: #0073e6;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.contact-form button[type="submit"]:hover {
+    background-color: #0058a8;
+}
+
+/* Stile per la sezione di informazioni di contatto */
+.contact-info {
+    background-color: #0f0f0f;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    max-width: 500px; /* Ridimensiona la larghezza della sezione */
+    margin: auto;
+}
+
+.contact-info p {
+    color: #ccc;
+}
+
+.contact-info ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.contact-info ul li {
+    margin-bottom: 10px;
+}
+
+.contact-info ul li i {
+    margin-right: 10px;
+    color: #0073e6;
+}
+

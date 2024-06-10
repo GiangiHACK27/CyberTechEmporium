@@ -215,7 +215,12 @@
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/ecommerce", "root", "root");
                 Statement stmt = con.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT id, nome, prezzo FROM OfferteSpeciali");
+                ResultSet rs = stmt.executeQuery("SELECT id, nome, prezzo, categoria\n" +
+                        "FROM (\n" +
+                        "    SELECT id, nome, prezzo, categoria, ROW_NUMBER() OVER (PARTITION BY categoria ORDER BY prezzo) AS `rank`\n" +
+                        "    FROM prodotti\n" +
+                        ") AS ranked\n" +
+                        "WHERE `rank` = 1");
                 while (rs.next()) {
         %>
         <div class="product">
@@ -226,12 +231,14 @@
         <%
                 }
                 con.close();
-            } catch (Exception e) {  // Corrected the typo here
-                out.println(e);       // Use the variable `e`
+            } catch (Exception e) {
+                out.println(e);
             }
         %>
     </div>
 </div>
+
+
 
 <div class="brands">
     <h2>Our Brands</h2>
@@ -242,13 +249,6 @@
         <i class="fab fa-google brand-icon"></i>
     </div>
 </div>
-
-<%-- Codice per mostrare il profilo dell'utente loggato --%>
-<% if (session.getAttribute("user") != null) { %>
-<div class="user-profile">
-    <a href="account.jsp"><i class="fa fa-user-circle"></i> <%= session.getAttribute("user") %></a>
-</div>
-<% } %>
 
 <div class="footer">
     <p>&copy; 2024 CyberTech Emporium. All rights reserved.</p>
