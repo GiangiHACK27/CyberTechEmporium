@@ -17,14 +17,27 @@
   <h1>Our Products</h1>
 </div>
 
+<div class="search-container">
+  <input type="text" id="searchInput" placeholder="Search products...">
+  <button onclick="searchProducts()">Search</button>
+</div>
+
 <div class="product-container">
   <%
     // Esegui la query per ottenere i prodotti dal database
+    String keyword = request.getParameter("search");
     try {
       Class.forName("com.mysql.cj.jdbc.Driver");
       Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/ecommerce", "root", "root");
       Statement stmt = con.createStatement();
-      ResultSet rs = stmt.executeQuery("SELECT id, nome, fornitore, prezzo, quantità_disponibile, marca, categoria FROM Prodotti");
+      ResultSet rs;
+      if (keyword != null && !keyword.isEmpty()) {
+        // Se è stata effettuata una ricerca, esegui la query con il filtro della parola chiave
+        rs = stmt.executeQuery("SELECT id, nome, fornitore, prezzo, quantità_disponibile, marca, categoria FROM Prodotti WHERE nome LIKE '%" + keyword + "%'");
+      } else {
+        // Altrimenti, mostra tutti i prodotti
+        rs = stmt.executeQuery("SELECT id, nome, fornitore, prezzo, quantità_disponibile, marca, categoria FROM Prodotti");
+      }
 
       while (rs.next()) {
   %>
@@ -50,6 +63,13 @@
 </footer>
 
 <script>
+  function searchProducts() {
+    var keyword = document.getElementById("searchInput").value; // Ottieni la parola chiave di ricerca
+    // Invia una richiesta al server per eseguire la ricerca
+    // Puoi farlo utilizzando AJAX o un semplice ricaricamento della pagina con i parametri della ricerca
+    window.location.href = "products.jsp?search=" + keyword;
+  }
+
   function addToCart(productId) {
     alert("Product " + productId + " added to cart!");
     // Aggiungi qui il codice per gestire l'aggiunta del prodotto al carrello

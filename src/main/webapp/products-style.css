@@ -76,3 +76,43 @@
     background-color: #0058a8;
 }
 
+/* Aggiunge spazio e stile al form di ricerca */
+.search-container {
+    text-align: center;
+    margin-bottom: 40px; /* Aumenta lo spazio dal contenuto sottostante */
+    padding: 20px; /* Aggiunge spazio intorno al form */
+    background-color: #1f1f1f; /* Aggiunge un colore di sfondo al form */
+    border-radius: 20px; /* Aggiunge un bordo arrotondato al form */
+}
+
+.search-container input[type=text] {
+    padding: 12px; /* Aumenta il padding del campo di input */
+    border-radius: 25px;
+    border: none;
+    font-size: 16px;
+    width: 70%;
+    margin-right: 10px;
+    background-color: #fff; /* Cambia il colore di sfondo del campo di input */
+    color: #000; /* Colore del testo modificato */
+    border: 2px solid #0073e6; /* Modificato il colore del bordo */
+    transition: border-color 0.3s ease; /* Aggiunta una transizione al cambio di colore del bordo */
+}
+
+.search-container input[type=text]:focus {
+    border-color: #0058a8; /* Cambia il colore del bordo quando il campo di input ha il focus */
+}
+
+.search-container button {
+    background-color: #0073e6;
+    color: white;
+    padding: 12px 24px; /* Aumenta il padding del pulsante */
+    border: none;
+    border-radius: 25px; /* Fatto corrispondere il bordo al campo di input */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.search-container button:hover {
+    background-color: #0058a8;
+}
+
