@@ -1,0 +1,78 @@
+/* Stile per la pagina dei prodotti */
+.products-header {
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+    color: #fff;
+    padding: 60px;
+    text-align: center;
+}
+
+.product-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px; /* Aggiunge spazio sopra i prodotti */
+    margin-bottom: 20px; /* Aggiunge spazio sotto i prodotti */
+}
+
+.product {
+    position: relative; /* Aggiunto posizionamento relativo */
+    flex: 1 0 270px; /* Allungato leggermente la larghezza massima del box */
+    max-width: 270px; /* Limita la larghezza massima di ogni prodotto */
+    margin: 10px; /* Riduce leggermente il margine tra i prodotti */
+    background-color: #2a2a2a; /* Cambiato colore di sfondo */
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* Modificato box-shadow */
+    padding: 20px;
+    padding-bottom: 40px; /* Aggiunto padding inferiore per spazio extra */
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product:hover {
+    transform: scale(1.05); /* Aggiunto ridimensionamento uniforme durante l'hover */
+    box-shadow: 0 0 25px rgba(0, 0, 255, 0.5);
+}
+
+.product img {
+    border-radius: 10px;
+    margin-bottom: 15px;
+    max-width: 100%;
+}
+
+.product h3 {
+    color: #0073e6; /* Cambiato colore del testo */
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.product p {
+    color: #fff; /* Cambiato colore del testo */
+    font-size: 16px;
+    margin-bottom: 10px; /* Aggiunge spazio sotto il paragrafo */
+}
+
+.product .price {
+    color: #0073e6;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.product .add-to-cart {
+    position: absolute; /* Aggiunto posizionamento assoluto */
+    bottom: 10px; /* Aumentato lo spazio dal fondo */
+    left: 50%; /* Posiziona il pulsante a metà */
+    transform: translateX(-50%); /* Centra orizzontalmente */
+    background-color: #0073e6;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease;
+}
+
+.product .add-to-cart:hover {
+    background-color: #0058a8;
+}
+
