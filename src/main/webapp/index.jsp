@@ -17,7 +17,7 @@
             }
 
             /* Includiamo il file CSS */
-            <%@ include file="style.css" %>
+            <%@ include file="css/style.css" %>
 
             /* Carosello */
             .carousel {

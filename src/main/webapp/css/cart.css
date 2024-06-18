@@ -1,0 +1,114 @@
+/* Stile generale per la pagina del carrello */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #121212;
+    color: #fff; /* Colore del testo bianco per tutto il body */
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    color: #0073e6;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #2a2a2a;
+    color: #fff; /* Colore del testo bianco per la tabella */
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+th, td {
+    border: 1px solid #333;
+    padding: 12px;
+    text-align: left;
+    color: #fff; /* Colore del testo bianco per le celle */
+}
+
+th {
+    background-color: #1f1f1f;
+    color: #0073e6;
+    text-transform: uppercase;
+}
+
+/* Stile per righe alternate nella tabella */
+tr:nth-child(even) {
+    background-color: #333;
+}
+
+/* Stile per i pulsanti nel carrello */
+.btn {
+    display: inline-block;
+    background-color: #0073e6;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #0058a8;
+}
+
+/* Stile per il footer del carrello */
+.cart-footer {
+    margin-top: 20px;
+    text-align: right;
+}
+
+/* Animazione per l'hover sui pulsanti */
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Stile per il piede di pagina */
+.footer {
+    background-color: #1f1f1f;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Stile per le animazioni generali */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Esempio di utilizzo dell'animazione fadeIn per la tabella */
+table {
+    animation: fadeIn 0.5s ease-out;
+}
