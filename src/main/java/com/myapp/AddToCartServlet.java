@@ -16,7 +16,6 @@ public class AddToCartServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Recupera o crea il carrello dalla sessione
         HttpSession session = request.getSession();
         List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
         if (cart == null) {
@@ -24,18 +23,26 @@ public class AddToCartServlet extends HttpServlet {
             session.setAttribute("cart", cart);
         }
 
-        // Ottieni i parametri dalla richiesta
         int productId = Integer.parseInt(request.getParameter("productId"));
         String name = request.getParameter("name");
         String description = request.getParameter("description");
         BigDecimal price = new BigDecimal(request.getParameter("price"));
         String imageUrl = request.getParameter("imageUrl");
 
-        // Crea un nuovo oggetto CartItem e aggiungilo al carrello
-        CartItem newItem = new CartItem(productId, name, description, price, imageUrl);
-        cart.add(newItem);
+        boolean productAlreadyInCart = false;
+        for (CartItem cartItem : cart) {
+            if (cartItem.getProductId() == productId) {
+                cartItem.setQuantity(cartItem.getQuantity() + 1);
+                productAlreadyInCart = true;
+                break;
+            }
+        }
 
-        // Opzionale: Puoi restituire una risposta JSON per confermare l'aggiunta al carrello
+        if (!productAlreadyInCart) {
+            CartItem newItem = new CartItem(productId, name, description, price, imageUrl, 1);
+            cart.add(newItem);
+        }
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write("{\"status\":\"success\"}");
