@@ -1,111 +1,166 @@
-/* Stili per la pagina del carrello */
+/* Reset CSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Stili specifici per la pagina del carrello */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa;
+    color: #333; /* Colore di default per il testo */
+    line-height: 1.6;
+}
 
 .container {
-    max-width: 800px;
-    margin: 30px auto; /* Maggiore margine superiore e inferiore */
+    max-width: 1200px;
+    margin: 20px auto;
     padding: 20px;
-    background-color: #f0f0f0;
-    border-radius: 10px;
+    background-color: #fff;
+    border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.title {
-    color: #007bff; /* Colore blu per il titolo */
-    font-size: 24px;
-    margin-bottom: 20px; /* Spazio inferiore */
+h1 {
+    font-size: 32px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #007bff; /* Blu elettrico per titolo principale */
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-th, td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
+table th, table td {
+    padding: 12px 15px;
     text-align: left;
+    border-bottom: 1px solid #ddd;
 }
 
-th {
-    background-color: #007bff;
-    color: #fff;
+table th {
+    background-color: #f2f2f2;
+    color: #333; /* Colore testo header tabella */
 }
 
-td {
-    color: #333; /* Colore testo per le celle del carrello */
-}
-
-.quantity-input {
-    width: 50px;
+/* Azioni */
+td:last-child {
     text-align: center;
 }
 
-.quantity-buttons {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.quantity-button {
-    padding: 8px 12px;
+/* Stile pulsanti */
+button {
+    padding: 10px 20px;
     background-color: #007bff;
     color: #fff;
     border: none;
     cursor: pointer;
-    transition: background-color 0.3s ease;
     border-radius: 4px;
+    transition: background-color 0.3s ease;
 }
 
-.quantity-button:hover {
+button:hover {
     background-color: #0056b3;
 }
 
-.remove-item {
-    padding: 8px 12px;
-    background-color: #dc3545;
+/* Pulsante Checkout */
+.checkout-btn {
+    padding: 12px 24px;
+    background-color: #17a2b8;
     color: #fff;
     border: none;
     cursor: pointer;
+    border-radius: 4px;
     transition: background-color 0.3s ease;
+}
+
+.checkout-btn:hover {
+    background-color: #138496;
+}
+
+/* Riquadro Codice Sconto */
+.discount-code {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.discount-code label {
+    font-weight: bold;
+    margin-right: 10px;
+    color: #333; /* Colore testo label */
+}
+
+.discount-code input[type="text"] {
+    padding: 10px;
+    width: 200px;
+    border: 1px solid #ccc;
     border-radius: 4px;
 }
 
-.remove-item:hover {
-    background-color: #c82333;
-}
-
-.checkout-button {
+.discount-code button {
     padding: 10px 20px;
     background-color: #28a745;
     color: #fff;
     border: none;
     cursor: pointer;
-    transition: background-color 0.3s ease;
     border-radius: 4px;
+    transition: background-color 0.3s ease;
 }
 
-.checkout-button:hover {
+.discount-code button:hover {
     background-color: #218838;
 }
 
-.total-section {
-    text-align: right;
+/* Quantità */
+.quantity-control {
+    display: flex;
+    align-items: center;
+}
+
+.quantity-minus,
+.quantity-plus {
+    padding: 8px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    margin: 0 5px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.quantity-minus:hover,
+.quantity-plus:hover {
+    background-color: #0056b3;
+}
+
+.quantity-input {
+    width: 40px;
+    padding: 8px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 0 5px;
+}
+
+.total {
     margin-top: 20px;
-    padding-top: 10px;
-    border-top: 1px solid #ddd;
-}
-
-.total-section h3 {
-    color: #007bff; /* Colore blu per il titolo Totale */
-}
-
-.total-section #total-price {
+    text-align: right;
     font-size: 24px;
+}
+
+.total label {
     font-weight: bold;
-    color: #28a745; /* Colore verde per il prezzo totale */
+    color: #333; /* Colore testo label */
+}
+
+.total span {
+    padding: 8px 12px;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 4px;
 }
