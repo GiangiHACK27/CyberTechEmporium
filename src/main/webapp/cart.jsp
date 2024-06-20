@@ -5,67 +5,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrello</title>
-    <link rel="stylesheet" href="css/cart.css"> <!-- Assicurati che il percorso al tuo file CSS sia corretto -->
+    <title>Il tuo carrello</title>
+    <link rel="stylesheet" href="css/cart.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
-        var updating = false; // Flag per evitare più aggiornamenti simultanei
-
-        function updateQuantity(productId, newQuantity) {
-            if (updating) return; // Se già in fase di aggiornamento, esce senza fare nulla
-            updating = true; // Imposta il flag a true per indicare l'avvio dell'aggiornamento
-
-            $.ajax({
-                type: 'POST',
-                url: 'updateCartQuantity', // URL della servlet per l'aggiornamento della quantità
-                data: {
-                    productId: productId,
-                    newQuantity: newQuantity
-                },
-                success: function(response) {
-                    // Aggiorna la quantità e il subtotale senza ricaricare la pagina
-                    var quantityElement = document.getElementById("quantity_" + productId);
-                    var subtotalElement = document.getElementById("subtotal_" + productId);
-                    var totalElement = document.getElementById("total");
-
-                    quantityElement.value = response.quantity; // Aggiorna la quantità nel campo input
-                    subtotalElement.innerText = response.subtotal; // Aggiorna il subtotale nel DOM
-                    totalElement.innerText = response.total; // Aggiorna il totale nel DOM
-
-                    updating = false; // Resetta il flag dopo aver completato l'aggiornamento
-                },
-                error: function(xhr, status, error) {
-                    alert('Errore durante l\'aggiornamento della quantità. Riprova più tardi.');
-                    updating = false; // Assicura che il flag sia resettato anche in caso di errore
+        $(document).ready(function() {
+            // Funzione per aggiornare la quantità di un prodotto nel carrello
+            $('.quantity-control').on('click', '.quantity-minus', function() {
+                var productId = $(this).data('product-id');
+                var currentQuantity = parseInt($('#quantity_' + productId).val(), 10);
+                if (currentQuantity > 1) {
+                    updateQuantity(productId, currentQuantity - 1);
                 }
             });
-        }
 
-        function removeFromCart(productId) {
-            if (updating) return; // Se già in fase di aggiornamento, esce senza fare nulla
-            updating = true; // Imposta il flag a true per indicare l'avvio della rimozione
-
-            $.ajax({
-                type: 'POST',
-                url: 'removeFromCart', // URL della servlet per rimuovere dal carrello
-                data: {
-                    productId: productId
-                },
-                success: function(response) {
-                    // Rimuovi la riga dal DOM senza ricaricare la pagina
-                    var rowToRemove = document.getElementById("row_" + productId);
-                    rowToRemove.parentNode.removeChild(rowToRemove);
-                    var totalElement = document.getElementById("total");
-                    totalElement.innerText = response.total; // Aggiorna il totale nel DOM
-
-                    updating = false; // Resetta il flag dopo aver completato la rimozione
-                },
-                error: function(xhr, status, error) {
-                    alert('Errore durante la rimozione dal carrello. Riprova più tardi.');
-                    updating = false; // Assicura che il flag sia resettato anche in caso di errore
-                }
+            $('.quantity-control').on('click', '.quantity-plus', function() {
+                var productId = $(this).data('product-id');
+                var currentQuantity = parseInt($('#quantity_' + productId).val(), 10);
+                updateQuantity(productId, currentQuantity + 1);
             });
-        }
+
+            // Funzione per aggiornare la quantità via AJAX
+            function updateQuantity(productId, newQuantity) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'updateCartQuantity',
+                    data: {
+                        productId: productId,
+                        newQuantity: newQuantity
+                    },
+                    success: function(response) {
+                        $('#quantity_' + productId).val(response.quantity);
+                        $('#subtotal_' + productId).text(response.subtotal);
+                        $('#total').text(response.total);
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Errore durante l\'aggiornamento della quantità. Riprova più tardi.');
+                    }
+                });
+            }
+
+            // Funzione per rimuovere un prodotto dal carrello
+            $('.remove-btn').click(function() {
+                var productId = $(this).data('product-id');
+                removeFromCart(productId);
+            });
+
+            // Funzione per rimuovere un prodotto via AJAX
+            function removeFromCart(productId) {
+                $.ajax({
+                    type: 'POST',
+                    url: 'removeFromCart',
+                    data: {
+                        productId: productId
+                    },
+                    success: function(response) {
+                        $('#row_' + productId).remove();
+                        $('#total').text(response.total);
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Errore durante la rimozione dal carrello. Riprova più tardi.');
+                    }
+                });
+            }
+        });
     </script>
 </head>
 <body>
@@ -89,50 +92,43 @@
                 <td>${item.price}</td>
                 <td>
                     <div class="quantity-control">
-                        <span class="quantity-minus" onclick="updateQuantity(${item.productId}, ${item.quantity - 1})">-</span>
-                        <input id="quantity_${item.productId}" type="text" value="${item.quantity}" readonly>
-                        <span class="quantity-plus" onclick="updateQuantity(${item.productId}, ${item.quantity + 1})">+</span>
+                        <span class="quantity-minus" data-product-id="${item.productId}">-</span>
+                        <input id="quantity_${item.productId}" class="quantity-input" type="text" value="${item.quantity}" readonly>
+                        <span class="quantity-plus" data-product-id="${item.productId}">+</span>
                     </div>
                 </td>
                 <td id="subtotal_${item.productId}">
-                    <c:choose>
-                        <c:when test="${item.price != null and item.quantity != null}">
-                            <c:out value="${item.price.multiply(item.quantity)}" />
-                        </c:when>
-                        <c:otherwise>
-                            0
-                        </c:otherwise>
-                    </c:choose>
+                        ${item.price * item.quantity} <!-- Calcola il subtotale lato server o implementa qui -->
                 </td>
                 <td>
-                    <button onclick="removeFromCart(${item.productId})">Rimuovi</button>
+                    <button class="remove-btn" data-product-id="${item.productId}">Rimuovi</button>
                 </td>
             </tr>
         </c:forEach>
         </tbody>
     </table>
 
-    <!-- Riquadro per il codice sconto -->
+    <!-- Riquadro Codice Sconto -->
     <div class="discount-code">
         <label for="coupon">Codice sconto:</label>
         <input type="text" id="coupon" placeholder="Inserisci il codice">
         <button onclick="applyCoupon()">Applica</button>
     </div>
 
-    <!-- Pulsante Checkout (accessibile solo se loggato) -->
+    <!-- Pulsante Checkout -->
     <c:if test="${not empty sessionScope.user}">
-        <button class="checkout-btn">Checkout</button>
+        <form action="checkout" method="post">
+            <button type="submit" class="checkout-btn">Checkout</button>
+        </form>
     </c:if>
     <c:if test="${empty sessionScope.user}">
         <p>Per procedere con il checkout, effettua il <a href="login.jsp">login</a>.</p>
     </c:if>
 
-    <!-- Mostra il totale -->
+    <!-- Totale -->
     <div class="total">
         <label>Totale:</label>
-        <span id="total">
-            ${totalAmount} <!-- Assumi che totalAmount sia l'importo totale calcolato -->
-        </span>
+        <span id="total">${totalAmount}</span> <!-- Sostituisci con la tua variabile per il totale -->
     </div>
 </div>
 </body>
