@@ -7,28 +7,6 @@ body {
     color: #fff;
 }
 
-/* Stile per la barra di navigazione */
-.navbar {
-    background-color: #1f1f1f;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.navbar a {
-    float: left;
-    display: block;
-    color: #ffffff;
-    text-align: center;
-    padding: 14px 20px;
-    text-decoration: none;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.navbar a:hover {
-    background-color: #0073e6;
-    color: #fff;
-}
-
 /* Stile per l'intestazione */
 .header {
     background: linear-gradient(to right, #0f2027, #203a43, #2c5364);

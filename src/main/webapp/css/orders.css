@@ -1,0 +1,96 @@
+/* Stile generale per il corpo della pagina */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5; /* Colore di sfondo generale */
+    color: #333; /* Colore del testo principale */
+}
+
+/* Stile per l'intestazione della pagina */
+h1 {
+    text-align: center;
+    color: #007bff; /* Colore blu principale */
+    margin: 20px 0;
+}
+
+/* Stile per il contenitore principale */
+.container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff; /* Sfondo bianco */
+    border-radius: 8px; /* Bordo arrotondato */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Ombra leggera */
+}
+
+/* Stile per il messaggio di login */
+.login-message {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 18px;
+    color: #007bff; /* Colore blu principale */
+}
+
+.login-message a {
+    color: #007bff; /* Colore blu per i link */
+    text-decoration: none; /* Rimuove la sottolineatura */
+    transition: color 0.3s ease; /* Transizione del colore al passaggio del mouse */
+}
+
+.login-message a:hover {
+    color: #0056b3; /* Cambio di colore al passaggio del mouse */
+}
+
+/* Stile per la tabella degli ordini */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff; /* Sfondo bianco */
+    border-radius: 8px; /* Bordo arrotondato */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Ombra leggera */
+    color: #333; /* Colore del testo principale */
+    overflow: hidden; /* Nasconde il bordo sottile */
+    transform: translateY(0); /* Resetta eventuali trasformazioni */
+    transition: transform 0.3s ease; /* Transizione fluida */
+}
+
+table th, table td {
+    border-bottom: 1px solid #ddd; /* Bordo inferiore sottile */
+    padding: 12px;
+    text-align: center;
+}
+
+table th {
+    background-color: #007bff; /* Colore di sfondo per le intestazioni */
+    color: #fff; /* Colore del testo bianco */
+}
+
+/* Stile per le righe alternate della tabella */
+table tbody tr:nth-child(even) {
+    background-color: #f2f2f2; /* Sfondo grigio chiaro */
+}
+
+/* Stile per il messaggio quando non ci sono ordini */
+.no-orders {
+    text-align: center;
+    font-style: italic;
+    color: #6c757d; /* Colore grigio scuro */
+    margin-top: 20px;
+}
+
+/* Stile per la transizione della tabella */
+.table-hover:hover table {
+    transform: translateY(-10px); /* Effetto hover alzamento */
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); /* Ombra leggera più evidente */
+}
+
+/* Stile per il piè di pagina */
+.footer {
+    background-color: #1f1f1f;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+}

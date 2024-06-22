@@ -1,0 +1,86 @@
+.navbar {
+    background-color: #1f1f1f;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.navbar a {
+    color: #ffffff;
+    text-decoration: none;
+    margin: 0 10px;
+    position: relative;
+    padding: 14px 20px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.navbar a:hover {
+    background-color: #0073e6;
+    color: #fff;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-right a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 10px;
+    position: relative;
+    padding: 14px 20px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.navbar-right a:hover {
+    background-color: #0073e6;
+    color: #fff;
+}
+
+.navbar a i,
+.navbar-right a i {
+    margin-right: 5px;
+    transition: transform 0.3s ease;
+}
+
+.navbar a:hover i,
+.navbar-right a:hover i {
+    transform: rotate(360deg);
+}
+
+.admin-button {
+    background-color: #1f1f1f;
+    color: white;
+    padding: 14px 20px;
+    font-size: 17px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.admin-button:hover {
+    background-color: #0073e6;
+}
+
+.admin-options {
+    padding: 20px;
+    background-color: #1f1f1f;
+    color: white;
+    margin-top: 20px;
+}
+
+.admin-options a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 10px 0;
+}
+
+.admin-options a:hover {
+    color: #0073e6;
+}

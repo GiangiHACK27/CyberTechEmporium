@@ -8,7 +8,7 @@ public class CartItem {
     private String description;
     private BigDecimal price;
     private String imageUrl;
-    private int quantity; // Quantità dell'elemento nel carrello
+    private int quantity;
 
     public CartItem(int productId, String name, String description, BigDecimal price, String imageUrl, int quantity) {
         this.productId = productId;
@@ -19,16 +19,8 @@ public class CartItem {
         this.quantity = quantity;
     }
 
-    // Getters e Setters per la quantità
-    public int getQuantity() {
-        return quantity;
-    }
+    // Getters and setters
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    // Getters e Setters per gli altri attributi
     public int getProductId() {
         return productId;
     }
@@ -67,5 +59,13 @@ public class CartItem {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }
