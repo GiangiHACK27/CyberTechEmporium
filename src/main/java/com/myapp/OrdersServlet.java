@@ -39,14 +39,13 @@ public class OrdersServlet extends HttpServlet {
 
         int userId = user.getId();
 
-        // Esegui la query per recuperare gli ordini dell'utente
         List<Order> orders = new ArrayList<>();
-        String sql = "SELECT * FROM ordini WHERE id_utente = 1";
+        String sql = "SELECT * FROM ordini WHERE id_utente = ?";
 
         try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            //stmt.setInt(1, userId);
+            stmt.setInt(1, userId);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -58,7 +57,6 @@ public class OrdersServlet extends HttpServlet {
                 orders.add(order);
             }
 
-            // Passa gli ordini alla pagina JSP
             request.setAttribute("orders", orders);
             request.getRequestDispatcher("orders.jsp").forward(request, response);
 

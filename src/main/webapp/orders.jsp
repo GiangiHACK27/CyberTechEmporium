@@ -12,9 +12,8 @@
 <%@ include file="navbar.jsp" %>
 <h1 style="text-align: center">I tuoi Ordini</h1>
 
-<%-- Controllo se l'utente è loggato --%>
 <%
-    session = request.getSession(false); // Ottiene la sessione senza crearne una nuova
+    session = request.getSession(false);
     if (session == null || session.getAttribute("userId") == null) {
 %>
 <div class="login-message">
@@ -22,14 +21,13 @@
     <a href="login.jsp">Accedi</a>
 </div>
 <% } else { %>
-
-<%-- Se l'utente è loggato, mostra la tabella degli ordini --%>
 <table>
     <thead>
     <tr>
         <th>ID Ordine</th>
         <th>Data</th>
         <th>Prezzo Totale</th>
+        <th>Dettagli</th>
     </tr>
     </thead>
     <tbody>
@@ -60,6 +58,7 @@
         <td><%= orderId %></td>
         <td><%= date %></td>
         <td><%= totalPrice %></td>
+        <td><a href="orderDetails.jsp?orderId=<%= orderId %>">Visualizza Dettagli</a></td>
     </tr>
     <%
         }
@@ -68,7 +67,7 @@
         if (!foundOrders) {
     %>
     <tr>
-        <td colspan="3" class="no-orders">Nessun ordine trovato.</td>
+        <td colspan="4" class="no-orders">Nessun ordine trovato.</td>
     </tr>
     <%
             }
@@ -78,7 +77,6 @@
     %>
     </tbody>
 </table>
-
 <% } %>
 
 </body>

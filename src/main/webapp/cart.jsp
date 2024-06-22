@@ -10,7 +10,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Funzione per aggiornare la quantità di un prodotto nel carrello
             $('.quantity-control').on('click', '.quantity-minus', function() {
                 var productId = $(this).data('product-id');
                 var currentQuantity = parseInt($('#quantity_' + productId).val(), 10);
@@ -25,7 +24,6 @@
                 updateQuantity(productId, currentQuantity + 1);
             });
 
-            // Funzione per aggiornare la quantità via AJAX
             function updateQuantity(productId, newQuantity) {
                 $.ajax({
                     type: 'POST',
@@ -45,13 +43,11 @@
                 });
             }
 
-            // Funzione per rimuovere un prodotto dal carrello
             $('.remove-btn').click(function() {
                 var productId = $(this).data('product-id');
                 removeFromCart(productId);
             });
 
-            // Funzione per rimuovere un prodotto via AJAX
             function removeFromCart(productId) {
                 $.ajax({
                     type: 'POST',
@@ -98,7 +94,7 @@
                     </div>
                 </td>
                 <td id="subtotal_${item.productId}">
-                        ${item.price * item.quantity} <!-- Calcola il subtotale lato server o implementa qui -->
+                        ${item.price * item.quantity}
                 </td>
                 <td>
                     <button class="remove-btn" data-product-id="${item.productId}">Rimuovi</button>
@@ -128,7 +124,12 @@
     <!-- Totale -->
     <div class="total">
         <label>Totale:</label>
-        <span id="total">${totalAmount}</span> <!-- Sostituisci con la tua variabile per il totale -->
+        <span id="total">
+            <c:forEach var="item" items="${sessionScope.cart}" varStatus="status">
+                <c:set var="total" value="${total + item.price * item.quantity}" scope="page"/>
+            </c:forEach>
+            ${total}
+        </span>
     </div>
 </div>
 </body>
