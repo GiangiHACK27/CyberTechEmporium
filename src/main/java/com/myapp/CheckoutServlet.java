@@ -40,11 +40,25 @@ public class CheckoutServlet extends HttpServlet {
         BigDecimal totalAmount = calculateTotal(cart);
 
         try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD)) {
-            Order newOrder = placeOrder(user.getId(), totalAmount, conn);
+            conn.setAutoCommit(false);
 
-            session.removeAttribute("cart");
+            try {
+                if (updateUserCredit(user.getId(), totalAmount, conn)) {
+                    Order newOrder = placeOrder(user.getId(), totalAmount, conn);
+                    addOrderDetails(newOrder.getId(), cart, conn);
+                    updateProductQuantities(cart, conn);
 
-            response.sendRedirect("orders.jsp?success=true");
+                    conn.commit();
+                    session.removeAttribute("cart");
+                    response.sendRedirect("orders.jsp?success=true");
+                } else {
+                    conn.rollback();
+                    response.sendRedirect("cart.jsp?error=not_enough_credit");
+                }
+            } catch (SQLException e) {
+                conn.rollback();
+                throw new ServletException("Database error", e);
+            }
         } catch (SQLException e) {
             throw new ServletException("Database error", e);
         }
@@ -58,6 +72,27 @@ public class CheckoutServlet extends HttpServlet {
             total = total.add(price.multiply(quantity));
         }
         return total;
+    }
+
+    private boolean updateUserCredit(int userId, BigDecimal totalAmount, Connection conn) throws SQLException {
+        String query = "SELECT credito FROM utenti WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                BigDecimal currentCredit = rs.getBigDecimal("credito");
+                if (currentCredit.compareTo(totalAmount) >= 0) {
+                    String updateCreditQuery = "UPDATE utenti SET credito = credito - ? WHERE id = ?";
+                    try (PreparedStatement updateStmt = conn.prepareStatement(updateCreditQuery)) {
+                        updateStmt.setBigDecimal(1, totalAmount);
+                        updateStmt.setInt(2, userId);
+                        updateStmt.executeUpdate();
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private Order placeOrder(int userId, BigDecimal totalAmount, Connection conn) throws SQLException {
@@ -81,6 +116,32 @@ public class CheckoutServlet extends HttpServlet {
             } else {
                 throw new SQLException("Failed to place order, no rows affected");
             }
+        }
+    }
+
+    private void addOrderDetails(int orderId, List<CartItem> cart, Connection conn) throws SQLException {
+        String sql = "INSERT INTO dettagli_ordine (id_ordine, id_prodotto, quantità, prezzo_unitario) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            for (CartItem item : cart) {
+                stmt.setInt(1, orderId);
+                stmt.setInt(2, item.getProductId());
+                stmt.setInt(3, item.getQuantity());
+                stmt.setBigDecimal(4, item.getPrice());
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
+        }
+    }
+
+    private void updateProductQuantities(List<CartItem> cart, Connection conn) throws SQLException {
+        String sql = "UPDATE prodotti SET quantità_disponibile = quantità_disponibile - ? WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            for (CartItem item : cart) {
+                stmt.setInt(1, item.getQuantity());
+                stmt.setInt(2, item.getProductId());
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
         }
     }
 }

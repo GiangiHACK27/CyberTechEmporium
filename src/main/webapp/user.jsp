@@ -6,6 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Account</title>
+  <link rel="stylesheet" href="css/navbar.css">
   <link rel="stylesheet" href="css/user.css">
 </head>
 <body>
@@ -31,7 +32,7 @@
       if (rs.next()) {
   %>
   <h2>Account Details</h2>
-  <form id="updateForm" action="updateUser.jsp" method="post">
+  <form id="updateForm" action="updateUser" method="post">
     <input type="hidden" name="id" value="<%= rs.getInt("id") %>">
     <label for="username">Username</label>
     <input type="text" id="username" name="username" value="<%= rs.getString("nickname") %>"><br>
@@ -45,7 +46,7 @@
     <input type="text" id="cognome" name="cognome" value="<%= rs.getString("cognome") %>"><br>
     <input type="submit" value="Update" id="updateBtn">
     <div class="confirm-btn-container">
-      <button class="confirm-btn">Conferma Modifiche</button>
+      <button type="button" class="confirm-btn">Conferma Modifiche</button>
     </div>
   </form>
 
