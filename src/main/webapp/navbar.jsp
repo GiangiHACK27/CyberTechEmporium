@@ -14,7 +14,7 @@
     <a href="index.jsp"><i class="fa fa-home"></i> Home</a>
     <a href="products.jsp"><i class="fa fa-box-open"></i> Products</a>
     <a href="orders.jsp"><i class="fa fa-file-invoice-dollar"></i> Ordini</a>
-    <a href="about.jsp"><i class="fa fa-info-circle"></i> About Us</a>
+    <a href="aboutUs.jsp"><i class="fa fa-info-circle"></i> About Us</a>
     <a href="contact.jsp"><i class="fa fa-envelope"></i> Contact</a>
 
     <!-- Pulsante Gestione Sito per admin -->
