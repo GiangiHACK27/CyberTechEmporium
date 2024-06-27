@@ -1,0 +1,78 @@
+/* Stile per la pagina discountCodes.jsp */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.admin-options {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+}
+
+.admin-options h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.admin-options a {
+    color: #fff;
+    text-decoration: none;
+    margin-right: 15px;
+    font-size: 18px;
+}
+
+.admin-options a:hover {
+    text-decoration: underline;
+}
+
+.discount-codes {
+    max-width: 1000px;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+.discount-codes h2 {
+    margin-top: 0;
+    font-size: 24px;
+    color: #333;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table th, table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+table th {
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+table td {
+    font-size: 16px;
+    color: #666;
+}
+
+.actions a {
+    color: #333;
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+.actions a:hover {
+    text-decoration: underline;
+}

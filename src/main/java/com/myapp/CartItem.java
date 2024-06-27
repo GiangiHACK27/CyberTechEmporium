@@ -1,8 +1,9 @@
 package com.myapp;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class CartItem {
+public class CartItem implements Serializable {
     private int productId;
     private String name;
     private String description;

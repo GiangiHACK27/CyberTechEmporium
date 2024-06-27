@@ -9,6 +9,33 @@
     <link rel="stylesheet" href="css/cart.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
+        function applyCoupon() {
+            var couponCode = $('#coupon').val().trim();
+            console.log("Coupon code: " + couponCode); // Aggiungi questo log per verificare il valore del codice sconto
+
+            $.ajax({
+                type: 'POST',
+                url: 'applyCoupon', // Servlet che gestirà l'applicazione del codice sconto
+                data: {
+                    couponCode: couponCode
+                },
+                dataType: 'json',
+                success: function(response) {
+                    console.log("Success response: ", response); // Log della risposta in caso di successo
+                    if (response.success) {
+                        $('#total').text(response.total); // Aggiorna il totale nel frontend
+                        alert('Codice sconto applicato con successo!');
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Errore durante l'applicazione del codice sconto:", error); // Log dell'errore
+                    alert('Errore durante l\'applicazione del codice sconto. Riprova più tardi.');
+                }
+            });
+        }
+
         $(document).ready(function() {
             $('.quantity-control').on('click', '.quantity-minus', function() {
                 var productId = $(this).data('product-id');
@@ -125,10 +152,7 @@
     <div class="total">
         <label>Totale:</label>
         <span id="total">
-            <c:forEach var="item" items="${sessionScope.cart}" varStatus="status">
-                <c:set var="total" value="${total + item.price * item.quantity}" scope="page"/>
-            </c:forEach>
-            ${total}
+            ${sessionScope.total}
         </span>
     </div>
 </div>

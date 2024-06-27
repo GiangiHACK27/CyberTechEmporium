@@ -51,9 +51,9 @@ public class OrdersServlet extends HttpServlet {
             while (rs.next()) {
                 int orderId = rs.getInt("id");
                 LocalDate date = rs.getDate("data").toLocalDate();
-                BigDecimal totalPrice = rs.getBigDecimal("prezzo_totale");
+                BigDecimal total = rs.getBigDecimal("prezzo_totale");
 
-                Order order = new Order(orderId, userId, date, totalPrice);
+                Order order = new Order(orderId, userId, date, total);
                 orders.add(order);
             }
 

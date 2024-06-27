@@ -1,0 +1,110 @@
+/* Stile per la pagina addDiscount.jsp */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.admin-options {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+}
+
+.admin-options h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.admin-options a {
+    color: #fff;
+    text-decoration: none;
+    margin-right: 15px;
+    font-size: 18px;
+}
+
+.admin-options a:hover {
+    text-decoration: underline;
+}
+
+.discount-form {
+    max-width: 600px;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #333;
+}
+
+.form-group input[type=text],
+.form-group textarea,
+.form-group input[type=number],
+.form-group input[type=date] {
+    width: calc(100% - 20px);
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input[type=text]:focus,
+.form-group textarea:focus,
+.form-group input[type=number]:focus,
+.form-group input[type=date]:focus {
+    border-color: #666;
+}
+
+.form-group textarea {
+    height: 120px;
+    resize: none;
+}
+
+.form-group input[type=checkbox] {
+    margin-top: 10px;
+    margin-right: 8px;
+}
+
+button[type=submit] {
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 18px;
+    transition: background-color 0.3s ease;
+}
+
+button[type=submit]:hover {
+    background-color: #45a049;
+}
+
+@media (max-width: 768px) {
+    .discount-form {
+        padding: 20px;
+    }
+
+    .form-group input[type=text],
+    .form-group textarea,
+    .form-group input[type=number],
+    .form-group input[type=date] {
+        width: 100%;
+    }
+}

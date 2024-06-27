@@ -2,7 +2,6 @@ package com.myapp;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class Cart {
@@ -51,5 +50,13 @@ public class Cart {
 
     public void clear() {
         items.clear();
+    }
+
+    public void applyDiscount(BigDecimal discountPercent) {
+        BigDecimal multiplier = BigDecimal.ONE.subtract(discountPercent.divide(BigDecimal.valueOf(100)));
+        for (CartItem item : items) {
+            BigDecimal discountedPrice = item.getPrice().multiply(multiplier);
+            item.setPrice(discountedPrice);
+        }
     }
 }
