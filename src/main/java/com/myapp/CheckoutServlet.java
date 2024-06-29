@@ -37,6 +37,11 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
 
+        if (cart == null || cart.isEmpty()) {
+            response.sendRedirect("cart.jsp?error=empty_cart");
+            return;
+        }
+
         BigDecimal totalAmount = calculateTotal(cart);
 
         try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD)) {

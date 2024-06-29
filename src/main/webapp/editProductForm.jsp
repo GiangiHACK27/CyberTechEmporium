@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page import="java.sql.*, java.math.BigDecimal, java.io.*, java.nio.file.Paths, java.nio.file.Files, java.util.Base64" %>
+<%@ page import="java.sql.*, java.math.BigDecimal, java.io.InputStream" %>
+<%@ page import="javax.servlet.http.Part" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -65,66 +66,6 @@
                     Class.forName("com.mysql.cj.jdbc.Driver");
                     conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ecommerce", "root", "root");
 
-                    // Gestione delle richieste POST
-                    if (request.getMethod().equalsIgnoreCase("post")) {
-                        String action = request.getParameter("action");
-                        if ("update".equals(action)) {
-                            // Recupero dei parametri dal form
-                            String nome = request.getParameter("nome");
-                            String fornitore = request.getParameter("fornitore");
-                            BigDecimal prezzo = new BigDecimal(request.getParameter("prezzo"));
-                            int quantita = Integer.parseInt(request.getParameter("quantita"));
-                            String marca = request.getParameter("marca");
-                            String categoria = request.getParameter("categoria");
-
-                            // Gestione del caricamento dell'immagine
-                            String immagine = null;
-                            Part filePart = request.getPart("immagine");
-                            if (filePart != null && filePart.getSize() > 0) {
-                                InputStream fileContent = filePart.getInputStream();
-                                immagine = Base64.getEncoder().encodeToString(fileContent.readAllBytes());
-                            }
-
-                            // Aggiornamento del prodotto nel database
-                            String updateQuery = "UPDATE prodotti SET nome = ?, fornitore = ?, prezzo = ?, quantità_disponibile = ?, marca = ?, categoria = ?, immagine = ? WHERE id = ?";
-                            ps = conn.prepareStatement(updateQuery);
-                            ps.setString(1, nome);
-                            ps.setString(2, fornitore);
-                            ps.setBigDecimal(3, prezzo);
-                            ps.setInt(4, quantita);
-                            ps.setString(5, marca);
-                            ps.setString(6, categoria);
-                            ps.setString(7, immagine);
-                            ps.setInt(8, productId);
-
-                            int rowsUpdated = ps.executeUpdate();
-                            if (rowsUpdated > 0) {
-                                out.println("<p class='success-message'>Prodotto aggiornato con successo.</p>");
-                            } else {
-                                out.println("<p class='error-message'>Errore nell'aggiornamento del prodotto.</p>");
-                            }
-                        } else if ("delete".equals(action)) {
-                            // Eliminazione del prodotto dal database
-                            String deleteDetailsQuery = "DELETE FROM dettagli_ordine WHERE id_prodotto = ?";
-                            PreparedStatement psDeleteDetails = conn.prepareStatement(deleteDetailsQuery);
-                            psDeleteDetails.setInt(1, productId);
-                            int rowsDeletedDetails = psDeleteDetails.executeUpdate();
-                            psDeleteDetails.close();
-
-                            String deleteProductQuery = "DELETE FROM prodotti WHERE id = ?";
-                            PreparedStatement psDeleteProduct = conn.prepareStatement(deleteProductQuery);
-                            psDeleteProduct.setInt(1, productId);
-                            int rowsDeletedProduct = psDeleteProduct.executeUpdate();
-                            psDeleteProduct.close();
-
-                            if (rowsDeletedProduct > 0) {
-                                out.println("<p class='success-message'>Prodotto eliminato con successo.</p>");
-                            } else {
-                                out.println("<p class='error-message'>Errore nell'eliminazione del prodotto.</p>");
-                            }
-                        }
-                    }
-
                     // Recupero dei dati del prodotto
                     String selectQuery = "SELECT * FROM prodotti WHERE id = ?";
                     ps = conn.prepareStatement(selectQuery);
@@ -138,71 +79,65 @@
                         int quantita = rs.getInt("quantità_disponibile");
                         String marca = rs.getString("marca");
                         String categoria = rs.getString("categoria");
-                        String immagine = rs.getString("immagine");
-
         %>
-        <form action="editProductForm.jsp?id=<%= productId %>" method="post" enctype="multipart/form-data">
+        <form action="updateProduct" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="id" value="<%= productId %>">
             <div class="form-group">
                 <label for="nome">Nome</label>
-                <input type="text" id="nome" name="nome" value="<%= nome %>">
+                <input type="text" id="nome" name="nome" value="<%= nome %>" required>
             </div>
             <div class="form-group">
                 <label for="fornitore">Fornitore</label>
-                <input type="text" id="fornitore" name="fornitore" value="<%= fornitore %>">
+                <input type="text" id="fornitore" name="fornitore" value="<%= fornitore %>" required>
             </div>
             <div class="form-group">
                 <label for="prezzo">Prezzo</label>
-                <input type="text" id="prezzo" name="prezzo" value="<%= prezzo %>">
+                <input type="number" id="prezzo" name="prezzo" step="0.01" value="<%= prezzo %>" required>
             </div>
             <div class="form-group">
                 <label for="quantita">Quantità Disponibile</label>
-                <input type="text" id="quantita" name="quantita" value="<%= quantita %>">
+                <input type="number" id="quantita" name="quantita" value="<%= quantita %>" required>
             </div>
             <div class="form-group">
                 <label for="marca">Marca</label>
-                <input type="text" id="marca" name="marca" value="<%= marca %>">
+                <input type="text" id="marca" name="marca" value="<%= marca %>" required>
             </div>
             <div class="form-group">
                 <label for="categoria">Categoria</label>
-                <input type="text" id="categoria" name="categoria" value="<%= categoria %>">
+                <input type="text" id="categoria" name="categoria" value="<%= categoria %>" required>
             </div>
             <div class="form-group">
                 <label for="immagine">Immagine</label>
-                <% if (immagine != null) { %>
-                <img src="data:image/jpeg;base64,<%= immagine %>" width="100"/>
-                <% } %>
-                <input type="file" id="immagine" name="immagine">
+                <input type="file" id="immagine" name="immagine" accept="image/*">
+                <%
+                    if (rs.getBinaryStream("immagine") != null) {
+                %>
+                <img src="getImage?id=<%= productId %>" alt="Product Image" style="max-width: 200px;">
+                <%
+                    }
+                %>
             </div>
-            <input type="hidden" name="action" value="update">
-            <button type="submit" class="btn-submit">Aggiorna Prodotto</button>
-        </form>
-        <form action="editProductForm.jsp?id=<%= productId %>" method="post" onsubmit="return confirm('Sei sicuro di voler eliminare questo prodotto?');">
-            <input type="hidden" name="action" value="delete">
-            <button type="submit" class="btn-delete">Elimina Prodotto</button>
+            <button type="submit" class="btn-submit" name="action" value="update">Aggiorna</button>
+            <button type="submit" class="btn-delete" name="action" value="delete" onclick="return confirm('Sei sicuro di voler eliminare questo prodotto?');">Elimina</button>
         </form>
         <%
                     } else {
                         out.println("<p class='error-message'>Prodotto non trovato.</p>");
                     }
-
-                } catch (ClassNotFoundException | SQLException e) {
-                    out.println("<p class='error-message'>Errore: " + e.getMessage() + "</p>");
+                } catch (ClassNotFoundException e) {
                     e.printStackTrace();
+                    out.println("<p class='error-message'>Errore: Impossibile trovare il driver JDBC.</p>");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    out.println("<p class='error-message'>Errore nella connessione al database.</p>");
                 } finally {
-                    // Chiusura delle risorse
-                    try {
-                        if (rs != null) rs.close();
-                        if (ps != null) ps.close();
-                        if (conn != null) conn.close();
-                    } catch (SQLException e) {
-                        out.println("<p class='error-message'>Errore SQL nella chiusura delle risorse: " + e.getMessage() + "</p>");
-                        e.printStackTrace();
-                    }
+                    if (rs != null) try { rs.close(); } catch (SQLException ignore) {}
+                    if (ps != null) try { ps.close(); } catch (SQLException ignore) {}
+                    if (conn != null) try { conn.close(); } catch (SQLException ignore) {}
                 }
             }
         %>
     </div>
 </div>
-
 </body>
 </html>

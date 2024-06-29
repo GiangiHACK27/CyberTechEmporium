@@ -28,7 +28,19 @@ public class UpdateProductServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        String action = request.getParameter("action");
         int id = Integer.parseInt(request.getParameter("id"));
+
+        if ("delete".equals(action)) {
+            deleteProduct(id, response);
+        } else {
+            updateProduct(request, response, id);
+        }
+    }
+
+    private void updateProduct(HttpServletRequest request, HttpServletResponse response, int id)
+            throws ServletException, IOException {
+
         String nome = request.getParameter("nome");
         String fornitore = request.getParameter("fornitore");
         BigDecimal prezzo = new BigDecimal(request.getParameter("prezzo"));
@@ -63,10 +75,39 @@ public class UpdateProductServlet extends HttpServlet {
             stmt.setInt(8, id);
             stmt.executeUpdate();
 
-            response.sendRedirect("products.jsp");
+            response.sendRedirect("editProduct.jsp");
 
         } catch (SQLException e) {
             throw new ServletException("Errore nell'aggiornamento del prodotto", e);
+        }
+    }
+
+    private void deleteProduct(int id, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String deleteDetailsQuery = "DELETE FROM dettagli_ordine WHERE id_prodotto = ?";
+        String deleteProductQuery = "DELETE FROM prodotti WHERE id = ?";
+
+        try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
+             PreparedStatement psDeleteDetails = conn.prepareStatement(deleteDetailsQuery);
+             PreparedStatement psDeleteProduct = conn.prepareStatement(deleteProductQuery)) {
+
+            // Elimina i dettagli dell'ordine associati al prodotto
+            psDeleteDetails.setInt(1, id);
+            psDeleteDetails.executeUpdate();
+
+            // Elimina il prodotto stesso
+            psDeleteProduct.setInt(1, id);
+            int rowsDeletedProduct = psDeleteProduct.executeUpdate();
+
+            if (rowsDeletedProduct > 0) {
+                response.sendRedirect("editProduct.jsp");
+            } else {
+                throw new ServletException("Errore nell'eliminazione del prodotto.");
+            }
+
+        } catch (SQLException e) {
+            throw new ServletException("Errore nell'eliminazione del prodotto", e);
         }
     }
 }

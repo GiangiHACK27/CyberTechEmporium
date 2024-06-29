@@ -1,7 +1,7 @@
+<%@ page import="java.sql.*, com.myapp.CartItem, java.util.List" %>
+<%@ page import="java.math.BigDecimal" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page import="java.sql.*, java.math.BigDecimal" %>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,6 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Prodotti - CyberTech Emporium</title>
   <link rel="stylesheet" href="css/products-style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 <body>
@@ -33,7 +34,7 @@
         <a href="#" onclick="filterProducts('<%=rs.getString("categoria")%>')"><%=rs.getString("categoria")%></a>
         <%
             }
-          } catch (Exception e) {
+          } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
           } finally {
             try {
@@ -75,7 +76,6 @@
       try {
         Class.forName("com.mysql.cj.jdbc.Driver");
         conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ecommerce", "root", "root");
-        Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
         String query = "SELECT SQL_CALC_FOUND_ROWS id, nome, fornitore, prezzo, quantità_disponibile, marca, categoria FROM Prodotti";
         String whereClause = "";
         String keyword = request.getParameter("search");
@@ -85,29 +85,62 @@
         String sortBy = request.getParameter("sortBy");
 
         if (keyword != null && !keyword.isEmpty()) {
-          whereClause += " WHERE nome LIKE '%" + keyword + "%'";
+          whereClause += " WHERE nome LIKE ?";
         }
         if (category != null && !category.isEmpty()) {
-          whereClause += (whereClause.isEmpty() ? " WHERE" : " AND") + " categoria = '" + category + "'";
+          whereClause += (whereClause.isEmpty() ? " WHERE" : " AND") + " categoria = ?";
         }
         if (minPrice != null && !minPrice.isEmpty()) {
-          whereClause += (whereClause.isEmpty() ? " WHERE" : " AND") + " prezzo >= " + minPrice;
+          whereClause += (whereClause.isEmpty() ? " WHERE" : " AND") + " prezzo >= ?";
         }
         if (maxPrice != null && !maxPrice.isEmpty()) {
-          whereClause += (whereClause.isEmpty() ? " WHERE" : " AND") + " prezzo <= " + maxPrice;
+          whereClause += (whereClause.isEmpty() ? " WHERE" : " AND") + " prezzo <= ?";
         }
-        query += whereClause;
-        if (sortBy != null && !sortBy.isEmpty()) {
-          query += " ORDER BY " + sortBy;
+
+        PreparedStatement pstmtCount = conn.prepareStatement("SELECT COUNT(*) FROM Prodotti" + whereClause);
+        PreparedStatement pstmtQuery = conn.prepareStatement(query + whereClause);
+
+        int paramIndex = 1;
+        if (keyword != null && !keyword.isEmpty()) {
+          pstmtQuery.setString(paramIndex, "%" + keyword + "%");
+          pstmtCount.setString(paramIndex++, "%" + keyword + "%");
         }
-        ResultSet rsCount = stmt.executeQuery("SELECT COUNT(*) FROM Prodotti" + whereClause);
+        if (category != null && !category.isEmpty()) {
+          pstmtQuery.setString(paramIndex, category);
+          pstmtCount.setString(paramIndex++, category);
+        }
+        if (minPrice != null && !minPrice.isEmpty()) {
+          pstmtQuery.setBigDecimal(paramIndex, new BigDecimal(minPrice));
+          pstmtCount.setBigDecimal(paramIndex++, new BigDecimal(minPrice));
+        }
+        if (maxPrice != null && !maxPrice.isEmpty()) {
+          pstmtQuery.setBigDecimal(paramIndex, new BigDecimal(maxPrice));
+          pstmtCount.setBigDecimal(paramIndex++, new BigDecimal(maxPrice));
+        }
+
+        ResultSet rsCount = pstmtCount.executeQuery();
         rsCount.next();
         int totalRecords = rsCount.getInt(1);
         totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
 
-        query += " LIMIT " + (currentPage - 1) * recordsPerPage + "," + recordsPerPage;
-        ResultSet rs = stmt.executeQuery(query);
+        pstmtQuery.setMaxRows(recordsPerPage);
+        pstmtQuery.setFetchSize(recordsPerPage * (currentPage - 1));
+        ResultSet rs = pstmtQuery.executeQuery();
         while (rs.next()) {
+          // Verifica se il prodotto è nel carrello
+          boolean inCart = false;
+          List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+          if (cart != null) {
+            for (CartItem item : cart) {
+              if (item.getProductId() == rs.getInt("id")) {
+                inCart = true;
+                break;
+              }
+            }
+          }
+          // Verifica disponibilità del prodotto
+          int availability = rs.getInt("quantità_disponibile");
+          boolean available = availability > 0;
     %>
     <div class="product-card">
       <img src="getImage?id=<%=rs.getInt("id")%>" alt="<%=rs.getString("nome")%>" class="product-image">
@@ -115,15 +148,30 @@
         <h3><%=rs.getString("nome")%></h3>
         <p>Brand: <%=rs.getString("marca")%></p>
         <p class="price">$<%=rs.getBigDecimal("prezzo")%></p>
-        <p>Available: <%=rs.getInt("quantità_disponibile")%> units</p>
-        <form id="cartForm_<%=rs.getInt("id")%>" onsubmit="addToCart(event, <%=rs.getInt("id")%>)">
-          <input type="hidden" name="productId" value="<%=rs.getInt("id")%>">
-          <input type="hidden" name="name" value="<%=rs.getString("nome")%>">
-          <input type="hidden" name="description" value="<%=rs.getString("marca")%>">
-          <input type="hidden" name="price" value="<%=rs.getBigDecimal("prezzo")%>">
-          <input type="hidden" name="imageUrl" value="getImage?id=<%=rs.getInt("id")%>">
-          <button type="submit" class="add-to-cart-btn" id="addBtn_<%=rs.getInt("id")%>">Aggiungi al carrello</button>
-        </form>
+        <p>
+          <% if (available) { %>
+          Available: <%=rs.getInt("quantità_disponibile")%> units
+          <% } else { %>
+          <span style="color: red;">Non disponibile</span>
+          <% } %>
+        </p>
+      </div>
+      <div class="card-footer">
+        <div id="cartActions_<%=rs.getInt("id")%>" class="cart-actions">
+          <% if (inCart) { %>
+          <span onclick="updateCartQuantity(<%=rs.getInt("id")%>, 'minus')" class="quantity-action"><i class="fas fa-minus-circle"></i></span>
+          <input id="quantity_<%=rs.getInt("id")%>" type="text" value="1" readonly>
+          <span onclick="updateCartQuantity(<%=rs.getInt("id")%>, 'plus')" class="quantity-action"><i class="fas fa-plus-circle"></i></span>
+          <span onclick="removeFromCart(<%=rs.getInt("id")%>)" class="remove-from-cart"><i class="fas fa-trash-alt"></i></span>
+          <% } else if (available) { %>
+          <form id="cartForm_<%=rs.getInt("id")%>" onsubmit="addToCart(event, <%=rs.getInt("id")%>)">
+            <input type="hidden" name="productId" value="<%=rs.getInt("id")%>">
+            <input type="hidden" name="productName" value="<%=rs.getString("nome")%>">
+            <input type="hidden" name="productPrice" value="<%=rs.getBigDecimal("prezzo")%>">
+            <button id="addBtn_<%=rs.getInt("id")%>" type="submit" class="add-to-cart-btn">Aggiungi al carrello</button>
+          </form>
+          <% } %>
+        </div>
       </div>
     </div>
     <%
@@ -141,81 +189,82 @@
   </div>
   <div class="pagination">
     <%
-      String keywordParam = (request.getParameter("search") != null) ? request.getParameter("search") : "";
-      String categoryParam = (request.getParameter("category") != null) ? request.getParameter("category") : "";
-      String minPriceParam = (request.getParameter("minPrice") != null) ? request.getParameter("minPrice") : "";
-      String maxPriceParam = (request.getParameter("maxPrice") != null) ? request.getParameter("maxPrice") : "";
-      String sortByParam = (request.getParameter("sortBy") != null) ? request.getParameter("sortBy") : "";
-
       for (int i = 1; i <= totalPages; i++) {
     %>
-    <a href="?page=<%=i%>&search=<%=keywordParam%>&category=<%=categoryParam%>&minPrice=<%=minPriceParam%>&maxPrice=<%=maxPriceParam%>&sortBy=<%=sortByParam%>" <%=i == currentPage ? "class='active'" : ""%>><%=i%></a>
-    <% }
+    <a href="products.jsp?page=<%=i%>" class="<%= i == currentPage ? "active" : "" %>"><%=i%></a>
+    <%
+      }
     %>
   </div>
 </div>
-
-<div class="footer">
-  <p>&copy; 2024 CyberTech Emporium. All rights reserved.</p>
-</div>
-
 <script>
-  function searchProducts() {
-    var keyword = document.getElementById("searchInput").value;
-    window.location.href = "?search=" + keyword;
-  }
-
-  function filterProducts(category) {
-    window.location.href = "?category=" + category;
-  }
-
-  function filterByPrice() {
-    var minPrice = document.getElementById("minPrice").value;
-    var maxPrice = document.getElementById("maxPrice").value;
-    window.location.href = "?minPrice=" + minPrice + "&maxPrice=" + maxPrice;
-  }
-
-  function sortBy() {
-    var sortBy = document.getElementById("sortBy").value;
-    window.location.href = "?sortBy=" + sortBy;
-  }
-
   function addToCart(event, productId) {
     event.preventDefault();
-    var form = document.getElementById("cartForm_" + productId);
-    var formData = $(form).serialize();
+    var form = $("#cartForm_" + productId);
     $.ajax({
-      type: 'POST',
-      url: 'addToCart',
-      data: formData,
+      type: "POST",
+      url: "AddToCartServlet",
+      data: form.serialize(),
       success: function(response) {
-        alert('Prodotto aggiunto al carrello!');
-        updateCartCounter(); // Esempio: aggiorna il contatore nel navbar
+        $("#cartActions_" + productId).html(response);
       },
-      error: function(xhr, status, error) {
-        alert('Errore durante l\'aggiunta al carrello. Riprova più tardi.');
+      error: function(error) {
+        console.log("Errore durante l'aggiunta al carrello: " + error);
       }
     });
   }
 
-  function toggleCategoryDropdown() {
-    var dropdownContent = document.getElementById("categoryDropdownContent");
-    dropdownContent.classList.toggle("show");
+  function updateCartQuantity(productId, action) {
+    $.ajax({
+      type: "POST",
+      url: "UpdateCartServlet",
+      data: { productId: productId, action: action },
+      success: function(response) {
+        $("#cartActions_" + productId).html(response);
+      },
+      error: function(error) {
+        console.log("Errore durante l'aggiornamento della quantità: " + error);
+      }
+    });
   }
 
-  // Close the dropdown menu if the user clicks outside of it
-  window.onclick = function(event) {
-    if (!event.target.matches('.category-dropdown span')) {
-      var dropdowns = document.getElementsByClassName("dropdown-content");
-      for (var i = 0; i < dropdowns.length; i++) {
-        var openDropdown = dropdowns[i];
-        if (openDropdown.classList.contains('show')) {
-          openDropdown.classList.remove('show');
-        }
+  function removeFromCart(productId) {
+    $.ajax({
+      type: "POST",
+      url: "RemoveFromCartServlet",
+      data: { productId: productId },
+      success: function(response) {
+        $("#cartActions_" + productId).html(response);
+      },
+      error: function(error) {
+        console.log("Errore durante la rimozione dal carrello: " + error);
       }
-    }
+    });
+  }
+
+  function searchProducts() {
+    var keyword = $("#searchInput").val();
+    window.location.href = "products.jsp?search=" + encodeURIComponent(keyword);
+  }
+
+  function filterProducts(category) {
+    window.location.href = "products.jsp?category=" + encodeURIComponent(category);
+  }
+
+  function filterByPrice() {
+    var minPrice = $("#minPrice").val();
+    var maxPrice = $("#maxPrice").val();
+    window.location.href = "products.jsp?minPrice=" + minPrice + "&maxPrice=" + maxPrice;
+  }
+
+  function sortBy() {
+    var sortBy = $("#sortBy").val();
+    window.location.href = "products.jsp?sortBy=" + sortBy;
+  }
+
+  function toggleCategoryDropdown() {
+    $("#categoryDropdownContent").toggle();
   }
 </script>
-
 </body>
 </html>

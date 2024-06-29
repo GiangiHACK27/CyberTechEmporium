@@ -11,26 +11,26 @@
     <script>
         function applyCoupon() {
             var couponCode = $('#coupon').val().trim();
-            console.log("Coupon code: " + couponCode); // Aggiungi questo log per verificare il valore del codice sconto
+            console.log("Coupon code: " + couponCode);
 
             $.ajax({
                 type: 'POST',
-                url: 'applyCoupon', // Servlet che gestirà l'applicazione del codice sconto
+                url: 'applyCoupon',
                 data: {
                     couponCode: couponCode
                 },
                 dataType: 'json',
                 success: function(response) {
-                    console.log("Success response: ", response); // Log della risposta in caso di successo
+                    console.log("Success response: ", response);
                     if (response.success) {
-                        $('#total').text(response.total); // Aggiorna il totale nel frontend
+                        $('#total').text(response.total);
                         alert('Codice sconto applicato con successo!');
                     } else {
                         alert(response.message);
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error("Errore durante l'applicazione del codice sconto:", error); // Log dell'errore
+                    console.error("Errore durante l'applicazione del codice sconto:", error);
                     alert('Errore durante l\'applicazione del codice sconto. Riprova più tardi.');
                 }
             });
@@ -78,13 +78,16 @@
             function removeFromCart(productId) {
                 $.ajax({
                     type: 'POST',
-                    url: 'removeFromCart',
+                    url: 'RemoveFromCartServlet',
                     data: {
                         productId: productId
                     },
                     success: function(response) {
                         $('#row_' + productId).remove();
                         $('#total').text(response.total);
+
+                        // Aggiungi il nuovo modulo per aggiungere il prodotto al carrello
+                        $('#cartFormContainer').append(response);
                     },
                     error: function(xhr, status, error) {
                         alert('Errore durante la rimozione dal carrello. Riprova più tardi.');
@@ -130,6 +133,9 @@
         </c:forEach>
         </tbody>
     </table>
+
+    <!-- Contenitore per nuovi moduli -->
+    <div id="cartFormContainer"></div>
 
     <!-- Riquadro Codice Sconto -->
     <div class="discount-code">
