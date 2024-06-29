@@ -48,17 +48,17 @@
     </div>
     <div class="price-filter">
       <label for="minPrice">Prezzo minimo:</label>
-      <input type="number" id="minPrice" value="0">
+      <input type="number" id="minPrice" value="<%= request.getParameter("minPrice") != null ? request.getParameter("minPrice") : "0" %>">
       <label for="maxPrice">Prezzo massimo:</label>
-      <input type="number" id="maxPrice" value="1000">
+      <input type="number" id="maxPrice" value="<%= request.getParameter("maxPrice") != null ? request.getParameter("maxPrice") : "1000" %>">
       <button onclick="filterByPrice()">Filtra</button>
     </div>
     <div class="sort-by">
       <label for="sortBy">Ordina per:</label>
       <select id="sortBy" onchange="sortBy()">
-        <option value="nome">Nome</option>
-        <option value="prezzo">Prezzo</option>
-        <option value="data_aggiunta">Data di aggiunta</option>
+        <option value="nome" <%= "nome".equals(request.getParameter("sortBy")) ? "selected" : "" %>>Nome</option>
+        <option value="prezzo" <%= "prezzo".equals(request.getParameter("sortBy")) ? "selected" : "" %>>Prezzo</option>
+        <option value="data_aggiunta" <%= "data_aggiunta".equals(request.getParameter("sortBy")) ? "selected" : "" %>>Data di aggiunta</option>
       </select>
     </div>
   </div>
@@ -66,23 +66,24 @@
 <div class="container">
   <div class="product-grid">
     <%
-      int recordsPerPage = 4;
-      int currentPage = 1;
-      if (request.getParameter("page") != null) {
-        currentPage = Integer.parseInt(request.getParameter("page"));
-      }
       Connection conn = null;
-      int totalPages = 0;
+      PreparedStatement pstmtQuery = null;
+      ResultSet rs = null;
+      String whereClause = "";
+      String keyword = request.getParameter("search");
+      String category = request.getParameter("category");
+      String minPrice = request.getParameter("minPrice");
+      String maxPrice = request.getParameter("maxPrice");
+      String sortBy = request.getParameter("sortBy");
+
+      // Dichiarazioni delle variabili
+      int recordsPerPage = 4;  // Dichiarazione di recordsPerPage
+      int count = 0;           // Dichiarazione di count
+
       try {
         Class.forName("com.mysql.cj.jdbc.Driver");
         conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ecommerce", "root", "root");
-        String query = "SELECT SQL_CALC_FOUND_ROWS id, nome, fornitore, prezzo, quantità_disponibile, marca, categoria FROM Prodotti";
-        String whereClause = "";
-        String keyword = request.getParameter("search");
-        String category = request.getParameter("category");
-        String minPrice = request.getParameter("minPrice");
-        String maxPrice = request.getParameter("maxPrice");
-        String sortBy = request.getParameter("sortBy");
+        String query = "SELECT id, nome, fornitore, prezzo, quantità_disponibile, marca, categoria FROM Prodotti";
 
         if (keyword != null && !keyword.isEmpty()) {
           whereClause += " WHERE nome LIKE ?";
@@ -97,50 +98,56 @@
           whereClause += (whereClause.isEmpty() ? " WHERE" : " AND") + " prezzo <= ?";
         }
 
-        PreparedStatement pstmtCount = conn.prepareStatement("SELECT COUNT(*) FROM Prodotti" + whereClause);
-        PreparedStatement pstmtQuery = conn.prepareStatement(query + whereClause);
+        // Costruzione della query principale con ordine e filtro
+        String mainQuery = query + whereClause + " ORDER BY " + sortBy;
+        pstmtQuery = conn.prepareStatement(mainQuery);
 
         int paramIndex = 1;
         if (keyword != null && !keyword.isEmpty()) {
-          pstmtQuery.setString(paramIndex, "%" + keyword + "%");
-          pstmtCount.setString(paramIndex++, "%" + keyword + "%");
+          pstmtQuery.setString(paramIndex++, "%" + keyword + "%");
         }
         if (category != null && !category.isEmpty()) {
-          pstmtQuery.setString(paramIndex, category);
-          pstmtCount.setString(paramIndex++, category);
+          pstmtQuery.setString(paramIndex++, category);
         }
         if (minPrice != null && !minPrice.isEmpty()) {
-          pstmtQuery.setBigDecimal(paramIndex, new BigDecimal(minPrice));
-          pstmtCount.setBigDecimal(paramIndex++, new BigDecimal(minPrice));
+          pstmtQuery.setBigDecimal(paramIndex++, new BigDecimal(minPrice));
         }
         if (maxPrice != null && !maxPrice.isEmpty()) {
-          pstmtQuery.setBigDecimal(paramIndex, new BigDecimal(maxPrice));
-          pstmtCount.setBigDecimal(paramIndex++, new BigDecimal(maxPrice));
+          pstmtQuery.setBigDecimal(paramIndex++, new BigDecimal(maxPrice));
         }
 
-        ResultSet rsCount = pstmtCount.executeQuery();
-        rsCount.next();
-        int totalRecords = rsCount.getInt(1);
-        totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+        rs = pstmtQuery.executeQuery();
 
-        pstmtQuery.setMaxRows(recordsPerPage);
-        pstmtQuery.setFetchSize(recordsPerPage * (currentPage - 1));
-        ResultSet rs = pstmtQuery.executeQuery();
+        // Impostazioni per la paginazione
+        int currentPage = 1;
+        String pageStr = request.getParameter("page");
+        if (pageStr != null) {
+          try {
+            currentPage = Integer.parseInt(pageStr);
+          } catch (NumberFormatException e) {
+            e.printStackTrace();
+          }
+        }
+
+        int start = (currentPage - 1) * recordsPerPage;
+        int end = start + recordsPerPage - 1;
+
         while (rs.next()) {
-          // Verifica se il prodotto è nel carrello
-          boolean inCart = false;
-          List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
-          if (cart != null) {
-            for (CartItem item : cart) {
-              if (item.getProductId() == rs.getInt("id")) {
-                inCart = true;
-                break;
+          if (count >= start && count <= end) {
+            // Verifica se il prodotto è nel carrello
+            boolean inCart = false;
+            List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+            if (cart != null) {
+              for (CartItem item : cart) {
+                if (item.getProductId() == rs.getInt("id")) {
+                  inCart = true;
+                  break;
+                }
               }
             }
-          }
-          // Verifica disponibilità del prodotto
-          int availability = rs.getInt("quantità_disponibile");
-          boolean available = availability > 0;
+            // Verifica disponibilità del prodotto
+            int availability = rs.getInt("quantità_disponibile");
+            boolean available = availability > 0;
     %>
     <div class="product-card">
       <img src="getImage?id=<%=rs.getInt("id")%>" alt="<%=rs.getString("nome")%>" class="product-image">
@@ -175,11 +182,15 @@
       </div>
     </div>
     <%
+          }
+          count++;
         }
-      } catch (Exception e) {
+      } catch (SQLException | ClassNotFoundException e) {
         e.printStackTrace();
       } finally {
         try {
+          if (rs != null) rs.close();
+          if (pstmtQuery != null) pstmtQuery.close();
           if (conn != null) conn.close();
         } catch (SQLException e) {
           e.printStackTrace();
@@ -187,15 +198,27 @@
       }
     %>
   </div>
-  <div class="pagination">
-    <%
-      for (int i = 1; i <= totalPages; i++) {
-    %>
-    <a href="products.jsp?page=<%=i%>" class="<%= i == currentPage ? "active" : "" %>"><%=i%></a>
-    <%
+</div>
+<div class="pagination">
+  <%
+    // Calcolo del numero totale di pagine
+    int totalProducts = count;
+    int totalPages = (int) Math.ceil((double) totalProducts / recordsPerPage);
+
+    // Generazione dei link per la paginazione
+    for (int i = 1; i <= totalPages; i++) {
+      String queryString = "";
+      if (request.getQueryString() != null && !request.getQueryString().isEmpty()) {
+        queryString = request.getQueryString().replaceAll("&?page=\\d+", ""); // Rimuove eventuali parametri "page"
+        queryString += "&";
+      } else {
+        queryString = "?";
       }
-    %>
-  </div>
+  %>
+  <a href="products.jsp?<%= queryString %>page=<%= i %>"><%= i %></a>
+  <%
+    }
+  %>
 </div>
 <script>
   function addToCart(event, productId) {
@@ -266,5 +289,8 @@
     $("#categoryDropdownContent").toggle();
   }
 </script>
+<div class="footer">
+  <p>&copy; 2024 CyberTech Emporium. All rights reserved.</p>
+</div>
 </body>
 </html>

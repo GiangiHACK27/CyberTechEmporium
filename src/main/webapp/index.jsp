@@ -77,27 +77,27 @@
 </div>
 
 <div class="section">
-    <h2>Special Offers</h2>
+    <h2>Last Arrived</h2>
     <div class="products">
-        <%-- Codice per mostrare offerte speciali --%>
-        <%-- Esempio di implementazione: --%>
         <%
             try {
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/ecommerce", "root", "root");
                 Statement stmt = con.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT id, nome, prezzo, categoria\n" +
-                        "FROM (\n" +
-                        "    SELECT id, nome, prezzo, categoria, ROW_NUMBER() OVER (PARTITION BY categoria ORDER BY prezzo) AS `rank`\n" +
-                        "    FROM prodotti\n" +
-                        ") AS ranked\n" +
-                        "WHERE `rank` = 1");
+                // Query per ottenere l'ultimo prodotto per categoria, limitato a 4 prodotti totali
+                String query = "SELECT p.id, p.nome, p.prezzo, p.categoria " +
+                        "FROM prodotti p " +
+                        "JOIN (SELECT categoria, MAX(id) AS max_id FROM prodotti GROUP BY categoria) max_ids " +
+                        "ON p.categoria = max_ids.categoria AND p.id = max_ids.max_id " +
+                        "ORDER BY p.id DESC " +
+                        "LIMIT 4";
+                ResultSet rs = stmt.executeQuery(query);
                 while (rs.next()) {
         %>
         <div class="product">
             <img src="getImage?id=<%= rs.getInt("id") %>" alt="<%= rs.getString("nome") %>">
             <h3><%= rs.getString("nome") %></h3>
-            <p>$<%= rs.getString("prezzo") %></p>
+            <p>$<%= rs.getString("prezzo") %> - <%= rs.getString("categoria") %></p>
         </div>
         <%
                 }
