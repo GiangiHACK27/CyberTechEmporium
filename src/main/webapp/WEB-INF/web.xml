@@ -3,6 +3,14 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
          http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
+    <error-page>
+        <error-code>404</error-code>
+        <location>/404notfound.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/500error.jsp</location>
+    </error-page>
     <resource-ref>
         <description>DB Connection</description>
         <res-ref-name>jdbc/YourDataSource</res-ref-name>
