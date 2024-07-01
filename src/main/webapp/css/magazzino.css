@@ -1,0 +1,151 @@
+/* Stile generale per il contenitore principale */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    margin-top: 30px;
+    font-family: 'Roboto', sans-serif;
+    animation: fadeIn 1s ease-in-out;
+}
+
+/* Animazione di fade-in */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Stile per il titolo principale */
+.container h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 2.5em;
+    letter-spacing: 1px;
+    position: relative;
+}
+
+.container h1::after {
+    content: '';
+    width: 50px;
+    height: 5px;
+    background-color: #0073e6;
+    display: block;
+    margin: 10px auto 0;
+    border-radius: 5px;
+}
+
+/* Stile per il campo di ricerca */
+.search-bar {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+/* Stile per la tabella */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+thead {
+    background-color: #0073e6;
+    color: white;
+    animation: slideDown 0.5s ease-in-out;
+}
+
+thead th {
+    padding: 15px;
+    text-align: left;
+    font-size: 1.2em;
+}
+
+tbody tr {
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+tbody tr:hover {
+    background-color: #f1f1f1;
+    transform: scale(1.01);
+}
+
+tbody td {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Stile per righe della tabella in base alla quantità */
+.low-stock {
+    background-color: #ffe6e6;
+    animation: blink 1s step-end infinite;
+}
+
+.medium-stock {
+    background-color: #fff8e1;
+}
+
+.high-stock {
+    background-color: #e6ffe6;
+}
+
+.low-stock td, .medium-stock td, .high-stock td {
+    color: #333;
+}
+
+/* Stile per prodotti non disponibili */
+strike {
+    color: red;
+}
+
+/* Animazione di blink per low-stock */
+@keyframes blink {
+    50% { background-color: #ffcccc; }
+}
+
+/* Stile per il piè di pagina */
+.footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #1f1f1f;
+    color: white;
+    margin-top: 30px;
+    border-radius: 0 0 10px 10px;
+    font-size: 0.9em;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+.footer p {
+    margin: 0;
+}
+
+/* Aggiunta di un effetto di ombra */
+.container, table, .footer {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Stile responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    table {
+        font-size: 0.9em;
+    }
+
+    thead th, tbody td {
+        padding: 10px;
+    }
+}

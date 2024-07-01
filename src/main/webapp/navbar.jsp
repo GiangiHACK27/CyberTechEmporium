@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="com.myapp.User" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,12 +19,9 @@
 
     <!-- Pulsante Gestione Sito per admin -->
     <%
-        // Ottieni l'oggetto User dalla sessione
-        User user = (User) session.getAttribute("user");
-        // Inizializza isAdmin a false di default
+        User sessionUser = (User) session.getAttribute("user");
         boolean isAdmin = false;
-        // Verifica se l'utente è admin
-        if (user != null && "admin".equals(user.getRuolo())) {
+        if (sessionUser != null && "admin".equals(sessionUser.getRuolo())) {
             isAdmin = true;
         }
 
@@ -34,7 +31,7 @@
     <% } %>
 
     <div class="navbar-right" id="navbarRight">
-        <% if (user != null) { %>
+        <% if (sessionUser != null) { %>
         <a href="logout.jsp"><i class="fa fa-sign-out-alt"></i> Logout</a>
         <a href="user.jsp"><i class="fa fa-user"></i> Account</a>
         <% } else { %>

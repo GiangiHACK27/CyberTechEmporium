@@ -1,5 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="com.myapp.User" %>
+<%
+    User user = (User) session.getAttribute("user");
+    if (user == null || !user.getRuolo().equals("admin")) {
+        response.sendRedirect("index.jsp");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,6 +40,7 @@
     <a href="editProduct.jsp"><i class="fa fa-edit"></i> Modifica Prodotto</a>
     <a href="discountCodes.jsp"><i class="fa fa-percentage"></i> Codici Sconto</a>
     <a href="siteStats.jsp"><i class="fa fa-chart-line"></i> Statistiche Sito</a>
+    <a href="magazzino.jsp"><i class="fa fa-warehouse"></i> Magazzino</a>
 </div>
 
 </body>

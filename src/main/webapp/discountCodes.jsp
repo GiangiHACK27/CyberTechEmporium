@@ -3,7 +3,13 @@
 <%@ page import="java.util.*" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Date" %>
-
+<%
+    User user = (User) session.getAttribute("user");
+    if (user == null || !user.getRuolo().equals("admin")) {
+        response.sendRedirect("index.jsp");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>

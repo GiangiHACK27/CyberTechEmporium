@@ -1,5 +1,13 @@
+<%@ page import="com.myapp.User" %>
 <!DOCTYPE html>
 <html lang="en">
+<%
+    User user = (User) session.getAttribute("user");
+    if (user == null || !user.getRuolo().equals("admin")) {
+        response.sendRedirect("index.jsp");
+        return;
+    }
+%>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
