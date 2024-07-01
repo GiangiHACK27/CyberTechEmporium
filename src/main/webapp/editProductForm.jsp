@@ -52,7 +52,7 @@
     <div class="admin-options">
         <h1>Modifica Prodotto</h1>
 
-        <%
+            <%
             String idParam = request.getParameter("id");
             if (idParam == null || idParam.isEmpty()) {
                 out.println("<p class='error-message'>Errore: ID prodotto non fornito.</p>");
@@ -79,9 +79,11 @@
                         int quantita = rs.getInt("quantità_disponibile");
                         String marca = rs.getString("marca");
                         String categoria = rs.getString("categoria");
+                        boolean hasImage = rs.getBinaryStream("immagine") != null;
         %>
         <form action="updateProduct" method="post" enctype="multipart/form-data">
             <input type="hidden" name="id" value="<%= productId %>">
+            <input type="hidden" name="hasImage" value="<%= hasImage %>">
             <div class="form-group">
                 <label for="nome">Nome</label>
                 <input type="text" id="nome" name="nome" value="<%= nome %>" required>
@@ -109,33 +111,29 @@
             <div class="form-group">
                 <label for="immagine">Immagine</label>
                 <input type="file" id="immagine" name="immagine" accept="image/*">
-                <%
-                    if (rs.getBinaryStream("immagine") != null) {
-                %>
+                <% if (hasImage) { %>
                 <img src="getImage?id=<%= productId %>" alt="Product Image" style="max-width: 200px;">
-                <%
-                    }
-                %>
+                <input type="hidden" name="hasExistingImage" value="true">
+                <% } %>
             </div>
             <button type="submit" class="btn-submit" name="action" value="update">Aggiorna</button>
             <button type="submit" class="btn-delete" name="action" value="delete" onclick="return confirm('Sei sicuro di voler eliminare questo prodotto?');">Elimina</button>
         </form>
-        <%
-                    } else {
-                        out.println("<p class='error-message'>Prodotto non trovato.</p>");
-                    }
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                    out.println("<p class='error-message'>Errore: Impossibile trovare il driver JDBC.</p>");
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    out.println("<p class='error-message'>Errore nella connessione al database.</p>");
-                } finally {
-                    if (rs != null) try { rs.close(); } catch (SQLException ignore) {}
-                    if (ps != null) try { ps.close(); } catch (SQLException ignore) {}
-                    if (conn != null) try { conn.close(); } catch (SQLException ignore) {}
-                }
-            }
+        <% } else {
+            out.println("<p class='error-message'>Prodotto non trovato.</p>");
+        }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            out.println("<p class='error-message'>Errore: Impossibile trovare il driver JDBC.</p>");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            out.println("<p class='error-message'>Errore nella connessione al database.</p>");
+        } finally {
+            if (rs != null) try { rs.close(); } catch (SQLException ignore) {}
+            if (ps != null) try { ps.close(); } catch (SQLException ignore) {}
+            if (conn != null) try { conn.close(); } catch (SQLException ignore) {}
+        }
+        }
         %>
     </div>
 </div>

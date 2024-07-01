@@ -49,12 +49,14 @@ public class UpdateProductServlet extends HttpServlet {
         String categoria = request.getParameter("categoria");
         Part immaginePart = request.getPart("immagine");
         InputStream immagineStream = null;
+        boolean isNewImageUploaded = immaginePart != null && immaginePart.getSize() > 0;
 
-        if (immaginePart != null && immaginePart.getSize() > 0) {
+        if (isNewImageUploaded) {
             immagineStream = immaginePart.getInputStream();
         }
 
-        String sql = "UPDATE prodotti SET nome = ?, fornitore = ?, prezzo = ?, quantità_disponibile = ?, marca = ?, categoria = ?, immagine = ? WHERE id = ?";
+        String sql = "UPDATE prodotti SET nome = ?, fornitore = ?, prezzo = ?, quantità_disponibile = ?, marca = ?, categoria = ?"
+                + (isNewImageUploaded ? ", immagine = ?" : "") + " WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -66,13 +68,13 @@ public class UpdateProductServlet extends HttpServlet {
             stmt.setString(5, marca);
             stmt.setString(6, categoria);
 
-            if (immagineStream != null) {
+            if (isNewImageUploaded) {
                 stmt.setBlob(7, immagineStream);
+                stmt.setInt(8, id);
             } else {
-                stmt.setNull(7, java.sql.Types.BLOB);
+                stmt.setInt(7, id);
             }
 
-            stmt.setInt(8, id);
             stmt.executeUpdate();
 
             response.sendRedirect("editProduct.jsp");
