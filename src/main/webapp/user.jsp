@@ -14,7 +14,7 @@
 <div class="container">
   <%
     // Ottieni l'oggetto User dalla sessione
-    user = (User) session.getAttribute("user");
+    User user = (User) session.getAttribute("user");
 
     // Verifica se l'utente è loggato
     if (user == null) {
